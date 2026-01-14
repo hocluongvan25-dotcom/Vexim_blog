@@ -3,23 +3,27 @@ import { Users, Clock, DollarSign, Headphones } from "lucide-react"
 const benefits = [
   {
     icon: Users,
-    title: "Chuyên gia giàu kinh nghiệm",
-    description: "Từ Mía đường Lam Sơn, Minh Phú Seafood đến xí nghiệp nhỏ 10 người ở Đồng Tháp - tất cả đều chọn chúng tôi vì sự tận tâm và chuyên môn thực chiến.",
+    title: "Đội ngũ chuyên gia pháp lý xuất nhập khẩu",
+    description:
+      "Đội ngũ tư vấn viên được đào tạo chuyên sâu về luật thương mại quốc tế, với kinh nghiệm xử lý hồ sơ cho nhiều doanh nghiệp xuất khẩu nông sản, thủy sản, mỹ phẩm.",
   },
   {
     icon: Clock,
-    title: "Xử lý trong 2-8 ngày, không chờ đợi",
-    description: "Trong khi công ty khác báo 2-3 tháng, chúng tôi cam kết hoàn thành FDA trong 10 ngày, GACC trong 30 ngày. Nếu trễ hạn - hoàn 100% phí dịch vụ.",
+    title: "Cam kết thời gian xử lý hồ sơ",
+    description:
+      "FDA 5-10 ngày, GACC 20-30 ngày, MFDS 30-45 ngày làm việc. Cam kết hoàn phí nếu chậm tiến độ do lỗi của chúng tôi, theo điều khoản hợp đồng.",
   },
   {
     icon: DollarSign,
-    title: "Minh bạch - Không phát sinh",
-    description: "Báo giá chi tiết từng khoản ngay từ đầu. Bạn biết chính xác mình trả tiền cho cái gì. Cam kết không thu thêm 1 đồng nào ngoài hợp đồng.",
+    title: "Minh bạch chi phí và hợp đồng rõ ràng",
+    description:
+      "Báo giá chi tiết từng hạng mục. Hợp đồng dịch vụ ghi rõ quyền lợi và nghĩa vụ của hai bên. Cam kết không phát sinh chi phí ngoài thỏa thuận ban đầu.",
   },
   {
     icon: Headphones,
-    title: "Hotline khẩn cấp 24/7",
-    description: "Luôn sẵn sàng giải đáp mọi thắc mắc, đồng hành cùng doanh nghiệp trong suốt quá trình hợp tác.",
+    title: "Hỗ trợ tư vấn pháp lý 24/7",
+    description:
+      "Đội ngũ tư vấn luôn sẵn sàng giải đáp thắc mắc về quy định pháp luật, hồ sơ chứng từ, và xử lý các tình huống phát sinh trong quá trình xuất nhập khẩu.",
   },
 ]
 

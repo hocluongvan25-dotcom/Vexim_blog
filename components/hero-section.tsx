@@ -73,25 +73,25 @@ export function HeroSection() {
           {/* Left Content */}
           <div className="text-white">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-balance leading-tight">
-              Container của bạn đang chờ tại cảng?
+              Hàng hóa bị tạm giữ tại cảng?
             </h1>
             <p className="text-lg md:text-xl mb-8 text-white/90 leading-relaxed">
-              Mỗi năm, Vexim Global đã giúp hàng trắm doanh nghiệp đưa sản phẩm vào thị trường Mỹ, Trung
-              Quốc, Hàn Quốc. Từ container tôm đông lạnh ở Cà Mau đến lô thanh long đầu tiên của anh nông dân Tiền Giang
-              - chúng tôi hiểu nỗi lo của bạn khi hàng đã đến cảng mà giấy tờ chưa xong.
+              Theo quy định pháp luật Hoa Kỳ (FDA), Trung Quốc (GACC) và Hàn Quốc (MFDS), hàng hóa nhập khẩu thiếu giấy
+              tờ hợp lệ sẽ bị tạm giữ hoặc trả về ngay. Vexim Global cung cấp dịch vụ tư vấn pháp lý xuất nhập khẩu
+              chuyên nghiệp, giúp doanh nghiệp tuân thủ quy định quốc tế và giảm thiểu rủi ro pháp lý.
             </p>
             <ul className="space-y-3 mb-8">
               <li className="flex items-center gap-3">
                 <CheckCircle2 className="w-6 h-6 text-accent flex-shrink-0" />
-                <span className="text-white/90">Xử lý hồ sơ FDA trong 48h - không để bạn chờ đợi</span>
+                <span className="text-white/90">Tuân thủ 100% quy định FDA, GACC, MFDS theo đúng luật định</span>
               </li>
               <li className="flex items-center gap-3">
                 <CheckCircle2 className="w-6 h-6 text-accent flex-shrink-0" />
-                <span className="text-white/90">Thủ tục nhanh chóng, chi phí tối ưu</span>
+                <span className="text-white/90">Hồ sơ pháp lý chính xác, hạn chế tối đa rủi ro bị từ chối</span>
               </li>
               <li className="flex items-center gap-3">
                 <CheckCircle2 className="w-6 h-6 text-accent flex-shrink-0" />
-                <span className="text-white/90">Hỗ trợ 24/7, tư vấn miễn phí - không phí ẩn</span>
+                <span className="text-white/90">Cam kết bảo mật thông tin theo quy định bảo vệ dữ liệu</span>
               </li>
             </ul>
             <Button
@@ -99,7 +99,7 @@ export function HeroSection() {
               className="bg-accent text-accent-foreground hover:bg-accent/90"
               onClick={() => setIsDialogOpen(true)}
             >
-              Bắt đầu ngay
+              Tư vấn miễn phí
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
           </div>

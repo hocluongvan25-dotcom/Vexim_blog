@@ -8,43 +8,43 @@ const services = [
     image: "/fda-food-safety-inspection-laboratory-professional.jpg",
     title: "Đăng ký FDA",
     description:
-      "Đối tác Mỹ đang gấp? Container sắp đến cảng nhưng chưa có FDA? Chúng tôi xử lý trong 5-10 ngày, giúp bạn không bị delay đơn hàng.",
+      "Hàng hóa thực phẩm, mỹ phẩm nhập khẩu Mỹ bắt buộc phải có FDA Registration. Thiếu FDA có thể bị tạm giữ hoặc trả hàng. Chúng tôi xử lý hồ sơ đúng quy chuẩn FDA trong 5-10 ngày.",
     link: "/services/fda",
   },
   {
     image: "/china-customs-port-container-shipping-trade.jpg",
-    title: "Tư vẫn Mã GACC",
+    title: "Tư vấn Mã GACC",
     description:
-      "Xuất sang Trung Quốc mà không có GACC - container chắc chắn bị giữ 100%. Chúng tôi đã giúp 300+ cơ sở xin mã GACC thành công.",
+      "Xuất khẩu nông sản, thủy sản sang Trung Quốc bắt buộc phải có Mã GACC theo quy định của Tổng cục Hải quan Trung Quốc. Không có GACC, lô hàng chắc chắn bị từ chối nhập khẩu.",
     link: "/services/gacc",
   },
   {
     image: "/korean-cosmetics-health-products-laboratory-qualit.jpg",
     title: "Giấy phép MFDS - Hàn Quốc",
     description:
-      "Thị trường Hàn Quốc khó tính với mỹ phẩm và thực phẩm chức năng. Chúng tôi am hiểu K-beauty standards, giúp sản phẩm Việt vượt qua thanh tra MFDS.",
+      "Theo Luật An toàn Thực phẩm và Y tế Hàn Quốc, mỹ phẩm và thực phẩm chức năng cần Giấy phép MFDS. Chúng tôi hỗ trợ hồ sơ đúng quy định Bộ Y tế Hàn Quốc.",
     link: "/services/mfds",
   },
   {
     image: "/us-customs-broker-agent-import-export-documentatio.jpg",
     title: "Dịch vụ Agent Hoa Kỳ",
     description:
-      "Cần địa chỉ pháp lý tại Mỹ để nhận thư FDA? Hoặc cần người xử lý khi bị FDA cảnh báo? Chúng tôi là đại diện của bạn tại đất Mỹ 24/7.",
+      "FDA yêu cầu mọi doanh nghiệp nước ngoài phải có US Agent tại Mỹ để nhận thông báo pháp lý. Chúng tôi đóng vai trò đại diện hợp pháp của bạn theo quy định FDA 21 CFR.",
     link: "/services/us-agent",
   },
   {
     image: "/ai-technology-blockchain-supply-chain-digital-trac.jpg",
     title: "Nền tảng truy xuất nguồn gốc AI",
     description:
-      "Từ đồng ruộng đến siêu thị - khách hàng quét QR là biết nguồn gốc. Công nghệ blockchain + AI giúp bạn chứng minh chất lượng, tăng giá bán 20-30%.",
+      "Hệ thống truy xuất nguồn gốc giúp doanh nghiệp tuân thủ yêu cầu ghi nhãn và minh bạch nguồn gốc theo quy định EU, Mỹ, Trung Quốc. Tích hợp blockchain bảo vệ dữ liệu không thể thay đổi.",
     link: "/services/ai-traceability",
-    badge: "Công nghệ mới",
+    badge: "Giải pháp công nghệ",
   },
   {
     image: "/international-trade-export-logistics-cargo-shippin.jpg",
     title: "Ủy thác xuất khẩu",
     description:
-      "Doanh nghiệp nhỏ, chưa có giấy phép xuất khẩu? Ủy thác cho chúng tôi - bạn chỉ lo sản xuất, phần còn lại hãy để Vexim Global hỗ trợ bạn.",
+      "Theo Nghị định 69/2018/NĐ-CP, doanh nghiệp có thể ủy thác xuất khẩu cho đơn vị có Giấy phép kinh doanh xuất nhập khẩu. Vexim Global đảm bảo tuân thủ đầy đủ quy trình pháp lý.",
     link: "/services/export-delegation",
   },
 ]
