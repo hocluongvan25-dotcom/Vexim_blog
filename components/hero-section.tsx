@@ -17,7 +17,9 @@ export function HeroSection() {
     phone: "",
     email: "",
     service: "",
-    honeypot: "", // Thêm honeypot field
+    product: "", // Added product field
+    description: "", // Added description field
+    honeypot: "",
   })
 
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -41,7 +43,7 @@ export function HeroSection() {
 
       if (response.ok) {
         setSubmitMessage("✓ Cảm ơn bạn! Chúng tôi sẽ liên hệ trong vòng 24h.")
-        setFormData({ name: "", phone: "", email: "", service: "", honeypot: "" })
+        setFormData({ name: "", phone: "", email: "", service: "", product: "", description: "", honeypot: "" }) // Reset new fields
       } else {
         setSubmitMessage(`✗ ${data.error || "Có lỗi xảy ra. Vui lòng thử lại."}`)
       }
@@ -117,34 +119,37 @@ export function HeroSection() {
                 autoComplete="off"
               />
 
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium mb-2">
-                  Họ và tên <span className="text-destructive">*</span>
-                </label>
-                <Input
-                  id="name"
-                  type="text"
-                  placeholder="Nguyễn Văn A"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  disabled={isSubmitting}
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="name" className="block text-sm font-medium mb-2">
+                    Họ và tên <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    id="name"
+                    type="text"
+                    placeholder="Nguyễn Văn A"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    disabled={isSubmitting}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="phone" className="block text-sm font-medium mb-2">
+                    Số điện thoại <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="0912 345 678"
+                    required
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    disabled={isSubmitting}
+                  />
+                </div>
               </div>
-              <div>
-                <label htmlFor="phone" className="block text-sm font-medium mb-2">
-                  Số điện thoại <span className="text-destructive">*</span>
-                </label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="0912 345 678"
-                  required
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  disabled={isSubmitting}
-                />
-              </div>
+
               <div>
                 <label htmlFor="email" className="block text-sm font-medium mb-2">
                   Email <span className="text-destructive">*</span>
@@ -179,6 +184,35 @@ export function HeroSection() {
                   <option value="delegation">Uỷ thác xuất nhập khẩu</option>
                   <option value="other">Khác</option>
                 </select>
+              </div>
+
+              <div>
+                <label htmlFor="product" className="block text-sm font-medium mb-2">
+                  Sản phẩm cần đăng ký
+                </label>
+                <Input
+                  id="product"
+                  type="text"
+                  placeholder="VD: Sữa tươi, Thực phẩm chức năng"
+                  value={formData.product}
+                  onChange={(e) => setFormData({ ...formData, product: e.target.value })}
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="description" className="block text-sm font-medium mb-2">
+                  Mô tả thêm (chứng chỉ, quy trình sản xuất...)
+                </label>
+                <textarea
+                  id="description"
+                  placeholder="VD: Có chứng chỉ ISO, sản xuất theo tiêu chuẩn GMP..."
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  disabled={isSubmitting}
+                  className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm"
+                  rows={3}
+                />
               </div>
 
               {submitMessage && (
