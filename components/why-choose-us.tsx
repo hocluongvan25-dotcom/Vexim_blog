@@ -4,7 +4,7 @@ const benefits = [
   {
     icon: Users,
     title: "Chuyên gia giàu kinh nghiệm",
-    description: "Từ Mía đường Lam Sơn, Minh Phú Seafood đến xí nghiệp nhỏ 10 người ở Đồng Tháp - tất cả đều chọn chúng tôi vì sự tận tâm và chuyên môn thực chiến.",",
+    description: "Từ Mía đường Lam Sơn, Minh Phú Seafood đến xí nghiệp nhỏ 10 người ở Đồng Tháp - tất cả đều chọn chúng tôi vì sự tận tâm và chuyên môn thực chiến.",
   },
   {
     icon: Clock,
