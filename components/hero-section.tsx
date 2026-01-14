@@ -6,7 +6,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card } from "@/components/ui/card"
-import { ArrowRight, CheckCircle2, Loader2 } from "lucide-react"
+import { ArrowRight, Loader2, Shield, FileCheck, Lock } from "lucide-react"
 import { ConsultationDialog } from "./consultation-dialog"
 
 export function HeroSection() {
@@ -17,8 +17,8 @@ export function HeroSection() {
     phone: "",
     email: "",
     service: "",
-    product: "", // Added product field
-    description: "", // Added description field
+    product: "",
+    description: "",
     honeypot: "",
   })
 
@@ -43,7 +43,7 @@ export function HeroSection() {
 
       if (response.ok) {
         setSubmitMessage("✓ Cảm ơn bạn! Chúng tôi sẽ liên hệ trong vòng 24h.")
-        setFormData({ name: "", phone: "", email: "", service: "", product: "", description: "", honeypot: "" }) // Reset new fields
+        setFormData({ name: "", phone: "", email: "", service: "", product: "", description: "", honeypot: "" })
       } else {
         setSubmitMessage(`✗ ${data.error || "Có lỗi xảy ra. Vui lòng thử lại."}`)
       }
@@ -75,22 +75,23 @@ export function HeroSection() {
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-balance leading-tight">
               Hàng hóa bị tạm giữ tại cảng?
             </h1>
+            <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-accent">Chúng tôi giải quyết ngay cho bạn</h2>
             <p className="text-lg md:text-xl mb-8 text-white/90 leading-relaxed">
-              Theo quy định pháp luật Hoa Kỳ (FDA), Trung Quốc (GACC) và Hàn Quốc (MFDS), hàng hóa nhập khẩu thiếu giấy
-              tờ hợp lệ sẽ bị tạm giữ hoặc trả về ngay. Vexim Global cung cấp dịch vụ tư vấn pháp lý xuất nhập khẩu
+              Theo quy định của FDA, GACC và MFDS Hàn Quốc, hàng hóa nhập khẩu thiếu giấy
+              tờ hợp lệ sẽ bị tạm giữ, tiêu hủy hoặc trả về ngay. Vexim Global cung cấp dịch vụ tư vấn pháp lý xuất nhập khẩu
               chuyên nghiệp, giúp doanh nghiệp tuân thủ quy định quốc tế và giảm thiểu rủi ro pháp lý.
             </p>
             <ul className="space-y-3 mb-8">
               <li className="flex items-center gap-3">
-                <CheckCircle2 className="w-6 h-6 text-accent flex-shrink-0" />
+                <Shield className="w-6 h-6 text-accent flex-shrink-0" />
                 <span className="text-white/90">Tuân thủ 100% quy định FDA, GACC, MFDS theo đúng luật định</span>
               </li>
               <li className="flex items-center gap-3">
-                <CheckCircle2 className="w-6 h-6 text-accent flex-shrink-0" />
+                <FileCheck className="w-6 h-6 text-accent flex-shrink-0" />
                 <span className="text-white/90">Hồ sơ pháp lý chính xác, hạn chế tối đa rủi ro bị từ chối</span>
               </li>
               <li className="flex items-center gap-3">
-                <CheckCircle2 className="w-6 h-6 text-accent flex-shrink-0" />
+                <Lock className="w-6 h-6 text-accent flex-shrink-0" />
                 <span className="text-white/90">Cam kết bảo mật thông tin theo quy định bảo vệ dữ liệu</span>
               </li>
             </ul>
