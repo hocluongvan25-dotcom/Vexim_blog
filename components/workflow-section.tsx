@@ -26,7 +26,7 @@ const workflowSteps = [
   },
   {
     number: "04",
-    title: "Nhận kết quả & Hỗ trợ",
+    title: "Bàn giao & Hỗ trợ",
     description: "Bàn giao giấy phép, hướng dẫn sử dụng và hỗ trợ duy trì tuân thủ lâu dài.",
     color: "from-emerald-500 to-emerald-600",
   },

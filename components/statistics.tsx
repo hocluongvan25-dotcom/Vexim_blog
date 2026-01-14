@@ -56,7 +56,7 @@ export function Statistics() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
-                <div className="text-4xl md:text-5xl font-bold mb-2 text-accent">{stat.number}</div>
+                <div className="text-4xl md:text-5xl font-bold mb-2 text-yellow-400 drop-shadow-lg">{stat.number}</div>
                 <div className="text-lg text-white/90">{stat.label}</div>
               </div>
             ))}
@@ -71,7 +71,7 @@ export function Statistics() {
             <div className="inline-flex items-center justify-center w-16 h-16 bg-destructive/10 rounded-full mb-4">
               <AlertCircle className="w-8 h-8 text-destructive" />
             </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">Vấn đề pháp lý phổ biến khi xuất khẩu</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">Vấn đề phổ biến khi xuất khẩu</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               Dựa trên phân tích hơn 1.000 trường hợp doanh nghiệp gặp khó khăn trong xuất nhập khẩu
             </p>
@@ -101,4 +101,3 @@ export function Statistics() {
     </div>
   )
 }
-// </CHANGE>
