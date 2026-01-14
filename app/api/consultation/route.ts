@@ -57,14 +57,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Số điện thoại không hợp lệ." }, { status: 400 })
     }
 
-    // Cấu hình Zoho Mail SMTP
+    // Cấu hình SMTP
     const transporter = nodemailer.createTransport({
-      host: "smtp.zoho.com",
-      port: 465,
+      host: process.env.EMAIL_HOST || "smtp.zoho.com", // Use EMAIL_HOST from Vercel
+      port: Number.parseInt(process.env.EMAIL_PORT || "465"), // Use EMAIL_PORT from Vercel
       secure: true, // SSL
       auth: {
-        user: process.env.ZOHO_EMAIL, // Email Zoho của bạn
-        pass: process.env.ZOHO_PASSWORD, // Mật khẩu hoặc App Password
+        user: process.env.EMAIL_USER, // Use EMAIL_USER from Vercel (not ZOHO_EMAIL)
+        pass: process.env.EMAIL_PASS, // Use EMAIL_PASS from Vercel (not ZOHO_PASSWORD)
       },
     })
 
@@ -82,7 +82,7 @@ export async function POST(request: Request) {
 
     // Email 1: Gửi cho khách hàng (xác nhận)
     await transporter.sendMail({
-      from: `"Vexim Global" <${process.env.ZOHO_EMAIL}>`,
+      from: `"Vexim Global" <${process.env.EMAIL_USER}>`, // Use EMAIL_USER
       to: email,
       subject: "Xác nhận đăng ký tư vấn - Vexim Global",
       html: `
@@ -136,8 +136,8 @@ export async function POST(request: Request) {
 
     // Email 2: Gửi cho admin (thông báo lead mới)
     await transporter.sendMail({
-      from: `"Vexim Website" <${process.env.ZOHO_EMAIL}>`,
-      to: process.env.ADMIN_EMAIL || process.env.ZOHO_EMAIL, // Email admin nhận thông báo
+      from: `"Vexim Website" <${process.env.EMAIL_USER}>`, // Use EMAIL_USER
+      to: process.env.ADMIN_EMAIL || process.env.EMAIL_USER, // Use EMAIL_USER
       subject: `🔔 Khách hàng mới đăng ký: ${name}`,
       html: `
         <!DOCTYPE html>
