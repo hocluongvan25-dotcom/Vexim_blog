@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const { name, phone, email, service, honeypot } = body
+    const { name, phone, email, service, product, description, honeypot } = body
 
     // Bảo mật: Kiểm tra honeypot (field ẩn để bắt bot)
     if (honeypot) {
@@ -76,7 +76,7 @@ export async function POST(request: Request) {
       gacc: "Mã GACC (Trung Quốc)",
       mfds: "Giấy phép MFDS (Hàn Quốc)",
       "agent-us": "Dịch vụ Agent Hoa Kỳ",
-      "ai-traceability": "Nền tảng truy xuất nguồn gốc tích hợp AI",
+      "ai-traceability": "Nền tảng truy xuất nguồn gốc",
       delegation: "Uỷ thác xuất nhập khẩu",
       other: "Khác",
     }
@@ -96,7 +96,7 @@ export async function POST(request: Request) {
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
           <div style="background: linear-gradient(135deg, #1e3a8a 0%, #065f46 100%); padding: 30px; text-align: center; border-radius: 10px 10px 0 0;">
             <h1 style="color: white; margin: 0; font-size: 28px;">Vexim Global</h1>
-            <p style="color: #d1fae5; margin: 10px 0 0 0;">Giải pháp xuất nhập khẩu toàn cầu</p>
+            <p style="color: #d1fae5; margin: 10px 0 0 0;">Tận Tâm - Nhanh Chóng - Chính Xác</p>
           </div>
           
           <div style="background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px;">
@@ -110,15 +110,17 @@ export async function POST(request: Request) {
               <p style="margin: 8px 0;"><strong>Số điện thoại:</strong> ${phone}</p>
               <p style="margin: 8px 0;"><strong>Email:</strong> ${email}</p>
               <p style="margin: 8px 0;"><strong>Dịch vụ quan tâm:</strong> ${serviceName}</p>
+              ${product ? `<p style="margin: 8px 0;"><strong>Sản phẩm cần đăng ký:</strong> ${product}</p>` : ""}
+              ${description ? `<p style="margin: 8px 0;"><strong>Mô tả thêm:</strong> ${description.replace(/\n/g, "<br>")}</p>` : ""}
             </div>
             
             <p><strong>Chuyên gia của chúng tôi sẽ liên hệ với bạn trong vòng 24 giờ</strong> để tư vấn chi tiết về giải pháp phù hợp nhất.</p>
             
             <p>Trong thời gian chờ đợi, bạn có thể:</p>
             <ul style="color: #4b5563;">
-              <li>Tham khảo thêm các dịch vụ trên website: <a href="https://vexim.vn" style="color: #1e3a8a;">vexim.vn</a></li>
-              <li>Liên hệ hotline: <strong style="color: #10b981;">1900 xxxx</strong> (8h-17h30 T2-T6)</li>
-              <li>Email: <a href="mailto:info@vexim.vn" style="color: #1e3a8a;">info@vexim.vn</a></li>
+              <li>Tham khảo thêm các dịch vụ trên website: <a href="https://veximglobal.com" style="color: #1e3a8a;">veximglobal.com</a></li>
+              <li>Liên hệ hotline: <strong style="color: #10b981;">0373 685 634</strong> (8h-17h30 T2-T6)</li>
+              <li>Email: <a href="mailto:contact@veximglobal.com" style="color: #1e3a8a;">contact@veximglobal.com</a></li>
             </ul>
             
             <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #e5e7eb;">
@@ -129,7 +131,7 @@ export async function POST(request: Request) {
           
           <div style="text-align: center; padding: 20px; color: #9ca3af; font-size: 12px;">
             <p>© 2026 Vexim Global. Bản quyền thuộc về Vexim Global.</p>
-            <p>123 Đường ABC, Quận 1, TP.HCM</p>
+            <p>Số 25/6/52 Ngoa Long, Tay Tuu, Ha Noi</p>
           </div>
         </body>
         </html>
@@ -160,6 +162,8 @@ export async function POST(request: Request) {
               <p style="margin: 10px 0;"><strong style="color: #065f46;">Số điện thoại:</strong> <a href="tel:${phone}" style="color: #1e3a8a;">${phone}</a></p>
               <p style="margin: 10px 0;"><strong style="color: #065f46;">Email:</strong> <a href="mailto:${email}" style="color: #1e3a8a;">${email}</a></p>
               <p style="margin: 10px 0;"><strong style="color: #065f46;">Dịch vụ quan tâm:</strong> <span style="background: #dbeafe; padding: 4px 12px; border-radius: 4px; color: #1e3a8a;">${serviceName}</span></p>
+              ${product ? `<p style="margin: 10px 0;"><strong style="color: #065f46;">Sản phẩm:</strong> ${product}</p>` : ""}
+              ${description ? `<p style="margin: 10px 0;"><strong style="color: #065f46;">Mô tả thêm:</strong><br><span style="color: #4b5563; font-style: italic;">${description.replace(/\n/g, "<br>")}</span></p>` : ""}
               <p style="margin: 10px 0; color: #6b7280; font-size: 14px;"><strong>Thời gian:</strong> ${new Date().toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })}</p>
             </div>
             

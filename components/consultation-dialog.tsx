@@ -20,6 +20,8 @@ export function ConsultationDialog({ open, onOpenChange, children }: Consultatio
     phone: "",
     email: "",
     service: "",
+    product: "",
+    description: "",
     honeypot: "",
   })
 
@@ -53,10 +55,10 @@ export function ConsultationDialog({ open, onOpenChange, children }: Consultatio
       const data = await response.json()
 
       if (response.ok) {
-        setSubmitMessage("✓ Cảm ơn bạn! Chúng tôi sẽ liên hệ trong vòng 24h.")
+        setSubmitMessage("✓ Bạn đã đăng ký thành công! Chúng tôi sẽ liên hệ với bạn trong 2-4h tới.")
         setTimeout(() => {
           handleOpenChange(false)
-          setFormData({ name: "", phone: "", email: "", service: "", honeypot: "" })
+          setFormData({ name: "", phone: "", email: "", service: "", product: "", description: "", honeypot: "" })
           setSubmitMessage("")
         }, 2000)
       } else {
@@ -78,7 +80,7 @@ export function ConsultationDialog({ open, onOpenChange, children }: Consultatio
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold text-primary">Đăng ký tư vấn miễn phí</DialogTitle>
-              <DialogDescription>Để lại thông tin, chúng tôi sẽ liên hệ với bạn trong vòng 24h</DialogDescription>
+              <DialogDescription>Vui long để lại thông tin, chúng tôi sẽ liên hệ với bạn sớm nhất</DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4 mt-4">
               <input
@@ -155,6 +157,35 @@ export function ConsultationDialog({ open, onOpenChange, children }: Consultatio
                 </select>
               </div>
 
+              <div>
+                <label htmlFor="popup-product" className="block text-sm font-medium mb-2">
+                  Sản phẩm cần đăng ký
+                </label>
+                <Input
+                  id="popup-product"
+                  type="text"
+                  placeholder="VD: Bột mỳ, Thực phẩm chức năng"
+                  value={formData.product}
+                  onChange={(e) => setFormData({ ...formData, product: e.target.value })}
+                  disabled={isSubmitting}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="popup-description" className="block text-sm font-medium mb-2">
+                  Mô tả thêm (chứng chỉ, quy trình sản xuất...)
+                </label>
+                <textarea
+                  id="popup-description"
+                  placeholder="VD: Chứng chỉ ISO, sản xuất theo tiêu chuẩn GMP..."
+                  value={formData.description}
+                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  disabled={isSubmitting}
+                  className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm"
+                  rows={4}
+                />
+              </div>
+
               {submitMessage && (
                 <div
                   className={`p-3 rounded-md text-sm ${submitMessage.startsWith("✓") ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"}`}
@@ -191,7 +222,7 @@ export function ConsultationDialog({ open, onOpenChange, children }: Consultatio
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-primary">Đăng ký tư vấn miễn phí</DialogTitle>
-          <DialogDescription>Để lại thông tin, chúng tôi sẽ liên hệ với bạn trong vòng 24h</DialogDescription>
+          <DialogDescription>Vui lòng để lại thông tin, chúng tôi sẽ liên hệ với bạn sớm nhât</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           <input
@@ -266,6 +297,35 @@ export function ConsultationDialog({ open, onOpenChange, children }: Consultatio
               <option value="delegation">Uỷ thác xuất nhập khẩu</option>
               <option value="other">Khác</option>
             </select>
+          </div>
+
+          <div>
+            <label htmlFor="popup-product" className="block text-sm font-medium mb-2">
+              Sản phẩm cần đăng ký
+            </label>
+            <Input
+              id="popup-product"
+              type="text"
+              placeholder="VD: Sữa tươi, Thực phẩm chức năng"
+              value={formData.product}
+              onChange={(e) => setFormData({ ...formData, product: e.target.value })}
+              disabled={isSubmitting}
+            />
+          </div>
+
+          <div>
+            <label htmlFor="popup-description" className="block text-sm font-medium mb-2">
+              Mô tả thêm (chứng chỉ, quy trình sản xuất...)
+            </label>
+            <textarea
+              id="popup-description"
+              placeholder="VD: Có chứng chỉ ISO, sản xuất theo tiêu chuẩn GMP..."
+              value={formData.description}
+              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+              disabled={isSubmitting}
+              className="w-full px-3 py-2 border border-input rounded-md bg-background text-sm"
+              rows={4}
+            />
           </div>
 
           {submitMessage && (
