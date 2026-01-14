@@ -80,7 +80,7 @@ export function ConsultationDialog({ open, onOpenChange, children }: Consultatio
           <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle className="text-2xl font-bold text-primary">Đăng ký tư vấn miễn phí</DialogTitle>
-              <DialogDescription>Vui long để lại thông tin, chúng tôi sẽ liên hệ với bạn sớm nhất</DialogDescription>
+              <DialogDescription>Vui lòng để lại thông tin, chúng tôi sẽ liên hệ với bạn sớm nhất</DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4 mt-4">
               <input
@@ -93,34 +93,37 @@ export function ConsultationDialog({ open, onOpenChange, children }: Consultatio
                 autoComplete="off"
               />
 
-              <div>
-                <label htmlFor="popup-name" className="block text-sm font-medium mb-2">
-                  Họ và tên <span className="text-destructive">*</span>
-                </label>
-                <Input
-                  id="popup-name"
-                  type="text"
-                  placeholder="Nguyễn Văn A"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  disabled={isSubmitting}
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="popup-name" className="block text-sm font-medium mb-2">
+                    Họ và tên <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    id="popup-name"
+                    type="text"
+                    placeholder="Nguyễn Văn A"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    disabled={isSubmitting}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="popup-phone" className="block text-sm font-medium mb-2">
+                    Số điện thoại <span className="text-destructive">*</span>
+                  </label>
+                  <Input
+                    id="popup-phone"
+                    type="tel"
+                    placeholder="0912 345 678"
+                    required
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    disabled={isSubmitting}
+                  />
+                </div>
               </div>
-              <div>
-                <label htmlFor="popup-phone" className="block text-sm font-medium mb-2">
-                  Số điện thoại <span className="text-destructive">*</span>
-                </label>
-                <Input
-                  id="popup-phone"
-                  type="tel"
-                  placeholder="0912 345 678"
-                  required
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  disabled={isSubmitting}
-                />
-              </div>
+
               <div>
                 <label htmlFor="popup-email" className="block text-sm font-medium mb-2">
                   Email <span className="text-destructive">*</span>
@@ -164,7 +167,7 @@ export function ConsultationDialog({ open, onOpenChange, children }: Consultatio
                 <Input
                   id="popup-product"
                   type="text"
-                  placeholder="VD: Bột mỳ, Thực phẩm chức năng"
+                  placeholder="VD: Sữa tươi, Thực phẩm chức năng"
                   value={formData.product}
                   onChange={(e) => setFormData({ ...formData, product: e.target.value })}
                   disabled={isSubmitting}
@@ -177,7 +180,7 @@ export function ConsultationDialog({ open, onOpenChange, children }: Consultatio
                 </label>
                 <textarea
                   id="popup-description"
-                  placeholder="VD: Chứng chỉ ISO, sản xuất theo tiêu chuẩn GMP..."
+                  placeholder="VD: Có chứng chỉ ISO, sản xuất theo tiêu chuẩn GMP..."
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   disabled={isSubmitting}
@@ -222,7 +225,7 @@ export function ConsultationDialog({ open, onOpenChange, children }: Consultatio
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-primary">Đăng ký tư vấn miễn phí</DialogTitle>
-          <DialogDescription>Vui lòng để lại thông tin, chúng tôi sẽ liên hệ với bạn sớm nhât</DialogDescription>
+          <DialogDescription>Vui lòng để lại thông tin, chúng tôi sẽ liên hệ với bạn sớm nhất</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           <input
@@ -235,34 +238,37 @@ export function ConsultationDialog({ open, onOpenChange, children }: Consultatio
             autoComplete="off"
           />
 
-          <div>
-            <label htmlFor="popup-name" className="block text-sm font-medium mb-2">
-              Họ và tên <span className="text-destructive">*</span>
-            </label>
-            <Input
-              id="popup-name"
-              type="text"
-              placeholder="Nguyễn Văn A"
-              required
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              disabled={isSubmitting}
-            />
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="popup-name" className="block text-sm font-medium mb-2">
+                Họ và tên <span className="text-destructive">*</span>
+              </label>
+              <Input
+                id="popup-name"
+                type="text"
+                placeholder="Nguyễn Văn A"
+                required
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                disabled={isSubmitting}
+              />
+            </div>
+            <div>
+              <label htmlFor="popup-phone" className="block text-sm font-medium mb-2">
+                Số điện thoại <span className="text-destructive">*</span>
+              </label>
+              <Input
+                id="popup-phone"
+                type="tel"
+                placeholder="0912 345 678"
+                required
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                disabled={isSubmitting}
+              />
+            </div>
           </div>
-          <div>
-            <label htmlFor="popup-phone" className="block text-sm font-medium mb-2">
-              Số điện thoại <span className="text-destructive">*</span>
-            </label>
-            <Input
-              id="popup-phone"
-              type="tel"
-              placeholder="0912 345 678"
-              required
-              value={formData.phone}
-              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-              disabled={isSubmitting}
-            />
-          </div>
+
           <div>
             <label htmlFor="popup-email" className="block text-sm font-medium mb-2">
               Email <span className="text-destructive">*</span>
