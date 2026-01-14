@@ -75,11 +75,13 @@ export function HeroSection() {
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-balance leading-tight">
               Hàng hóa bị tạm giữ tại cảng?
             </h1>
-            <h2 className="text-2xl md:text-3xl font-semibold mb-6 text-accent">Chúng tôi giải quyết ngay cho bạn</h2>
+            <h2 className="text-2xl md:text-3xl font-bold mb-6 text-yellow-400 drop-shadow-lg">
+              Chúng tôi giải quyết ngay cho bạn
+            </h2>
             <p className="text-lg md:text-xl mb-8 text-white/90 leading-relaxed">
-              Theo quy định của FDA, GACC và MFDS Hàn Quốc, hàng hóa nhập khẩu thiếu giấy
-              tờ hợp lệ sẽ bị tạm giữ, tiêu hủy hoặc trả về ngay. Vexim Global cung cấp dịch vụ tư vấn pháp lý xuất nhập khẩu
-              chuyên nghiệp, giúp doanh nghiệp tuân thủ quy định quốc tế và giảm thiểu rủi ro pháp lý.
+              Theo quy định của FDA, GACC và MFDS Hàn Quốc, hàng hóa nhập khẩu thiếu giấy tờ hợp lệ sẽ bị tạm giữ, tiêu
+              hủy hoặc trả về ngay. Vexim Global cung cấp dịch vụ tư vấn pháp lý xuất nhập khẩu chuyên nghiệp, giúp
+              doanh nghiệp tuân thủ quy định quốc tế và giảm thiểu rủi ro pháp lý.
             </p>
             <ul className="space-y-3 mb-8">
               <li className="flex items-center gap-3">
