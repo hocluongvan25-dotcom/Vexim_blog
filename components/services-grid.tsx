@@ -8,43 +8,43 @@ const services = [
     image: "/fda-food-safety-inspection-laboratory-professional.jpg",
     title: "Đăng ký FDA",
     description:
-      "Tư vấn và hỗ trợ đăng ký FDA cho thực phẩm, mỹ phẩm, thiết bị y tế xuất khẩu sang thị trường Hoa Kỳ. Quy trình chuyên nghiệp, đảm bảo tuân thủ.",
+      "Đối tác Mỹ đang gấp? Container sắp đến cảng nhưng chưa có FDA? Chúng tôi xử lý trong 5-10 ngày, giúp bạn không bị delay đơn hàng.",
     link: "/services/fda",
   },
   {
     image: "/china-customs-port-container-shipping-trade.jpg",
-    title: "Đăng ký GACC",
+    title: "Tư vẫn Mã GACC",
     description:
-      "Hỗ trợ doanh nghiệp đăng ký mã số GACC để xuất khẩu hàng hóa vào Trung Quốc. Kinh nghiệm phong phú, tỷ lệ thành công cao.",
+      "Xuất sang Trung Quốc mà không có GACC - container chắc chắn bị giữ 100%. Chúng tôi đã giúp 300+ cơ sở xin mã GACC thành công.",
     link: "/services/gacc",
   },
   {
     image: "/korean-cosmetics-health-products-laboratory-qualit.jpg",
-    title: "Giấy phép MFDS (Hàn Quốc)",
+    title: "Giấy phép MFDS - Hàn Quốc",
     description:
-      "Tư vấn cấp giấy phép Bộ An toàn Thực phẩm và Dược phẩm Hàn Quốc cho sản phẩm thực phẩm chức năng, mỹ phẩm.",
+      "Thị trường Hàn Quốc khó tính với mỹ phẩm và thực phẩm chức năng. Chúng tôi am hiểu K-beauty standards, giúp sản phẩm Việt vượt qua thanh tra MFDS.",
     link: "/services/mfds",
   },
   {
     image: "/us-customs-broker-agent-import-export-documentatio.jpg",
     title: "Dịch vụ Agent Hoa Kỳ",
     description:
-      "Đại diện pháp lý tại Hoa Kỳ cho doanh nghiệp Việt Nam, xử lý mọi thủ tục hải quan, tuân thủ và giao nhận hàng hóa một cách chuyên nghiệp.",
+      "Cần địa chỉ pháp lý tại Mỹ để nhận thư FDA? Hoặc cần người xử lý khi bị FDA cảnh báo? Chúng tôi là đại diện của bạn tại đất Mỹ 24/7.",
     link: "/services/us-agent",
   },
   {
     image: "/ai-technology-blockchain-supply-chain-digital-trac.jpg",
-    title: "Nền tảng truy xuất nguồn gốc tích hợp AI",
+    title: "Nền tảng truy xuất nguồn gốc AI",
     description:
-      "Giải pháp công nghệ tiên phong đầu tiên tại Việt Nam, ứng dụng AI và Blockchain để truy xuất nguồn gốc sản phẩm, tăng cường minh bạch chuỗi cung ứng.",
+      "Từ đồng ruộng đến siêu thị - khách hàng quét QR là biết nguồn gốc. Công nghệ blockchain + AI giúp bạn chứng minh chất lượng, tăng giá bán 20-30%.",
     link: "/services/ai-traceability",
-    badge: "Đầu tiên tại VN",
+    badge: "Công nghệ mới",
   },
   {
     image: "/international-trade-export-logistics-cargo-shippin.jpg",
     title: "Ủy thác xuất khẩu",
     description:
-      "Dịch vụ ủy thác xuất nhập khẩu toàn diện, giúp doanh nghiệp tiết kiệm chi phí và đơn giản hóa quy trình thương mại quốc tế.",
+      "Doanh nghiệp nhỏ, chưa có giấy phép xuất khẩu? Ủy thác cho chúng tôi - bạn chỉ lo sản xuất, phần còn lại hãy để Vexim Global hỗ trợ bạn.",
     link: "/services/export-delegation",
   },
 ]
@@ -55,10 +55,10 @@ export function ServicesGrid() {
       <div className="container mx-auto px-4">
         <div className="text-center mb-12 md:mb-16">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary mb-4 text-balance">
-            Dịch vụ của chúng tôi
+            Chúng tôi giải quyết vấn đề gì cho bạn?
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            Giải pháp toàn diện cho mọi nhu cầu xuất nhập khẩu của doanh nghiệp bạn
+            Không chỉ làm giấy tờ - chúng tôi giúp bạn tránh rủi ro và tăng cơ hội thành công
           </p>
         </div>
 

@@ -4,21 +4,21 @@ const benefits = [
   {
     icon: Users,
     title: "Chuyên gia giàu kinh nghiệm",
-    description: "Đội ngũ tư vấn viên dày dặn kinh nghiệm 10+ năm trong lĩnh vực xuất nhập khẩu và pháp lý quốc tế.",
+    description: "Từ Mía đường Lam Sơn, Minh Phú Seafood đến xí nghiệp nhỏ 10 người ở Đồng Tháp - tất cả đều chọn chúng tôi vì sự tận tâm và chuyên môn thực chiến.",",
   },
   {
     icon: Clock,
-    title: "Thời gian nhanh chóng",
-    description: "Cam kết xử lý hồ sơ nhanh nhất, rút ngắn thời gian chờ đợi, giúp doanh nghiệp tiết kiệm thời gian.",
+    title: "Xử lý trong 2-8 ngày, không chờ đợi",
+    description: "Trong khi công ty khác báo 2-3 tháng, chúng tôi cam kết hoàn thành FDA trong 10 ngày, GACC trong 30 ngày. Nếu trễ hạn - hoàn 100% phí dịch vụ.",
   },
   {
     icon: DollarSign,
-    title: "Chi phí tối ưu",
-    description: "Mức phí cạnh tranh, minh bạch, không phát sinh chi phí ẩn. Tư vấn miễn phí trước khi triển khai.",
+    title: "Minh bạch - Không phát sinh",
+    description: "Báo giá chi tiết từng khoản ngay từ đầu. Bạn biết chính xác mình trả tiền cho cái gì. Cam kết không thu thêm 1 đồng nào ngoài hợp đồng.",
   },
   {
     icon: Headphones,
-    title: "Hỗ trợ 24/7",
+    title: "Hotline khẩn cấp 24/7",
     description: "Luôn sẵn sàng giải đáp mọi thắc mắc, đồng hành cùng doanh nghiệp trong suốt quá trình hợp tác.",
   },
 ]

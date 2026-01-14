@@ -73,16 +73,17 @@ export function HeroSection() {
           {/* Left Content */}
           <div className="text-white">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-balance leading-tight">
-              Giải Pháp Xuất Nhập Khẩu Toàn Cầu
+              Container của bạn đang chờ tại cảng?
             </h1>
             <p className="text-lg md:text-xl mb-8 text-white/90 leading-relaxed">
-              Đối tác tin cậy của hơn 500 doanh nghiệp Việt Nam trong việc chinh phục thị trường quốc tế. Chúng tôi mang
-              đến dịch vụ tư vấn pháp lý xuất nhập khẩu chuyên nghiệp, nhanh chóng và hiệu quả.
+              Mỗi năm, Vexim Global đã giúp hàng trắm doanh nghiệp đưa sản phẩm vào thị trường Mỹ, Trung
+              Quốc, Hàn Quốc. Từ container tôm đông lạnh ở Cà Mau đến lô thanh long đầu tiên của anh nông dân Tiền Giang
+              - chúng tôi hiểu nỗi lo của bạn khi hàng đã đến cảng mà giấy tờ chưa xong.
             </p>
             <ul className="space-y-3 mb-8">
               <li className="flex items-center gap-3">
                 <CheckCircle2 className="w-6 h-6 text-accent flex-shrink-0" />
-                <span className="text-white/90">Chuyên gia giàu kinh nghiệm 10+ năm</span>
+                <span className="text-white/90">Xử lý hồ sơ FDA trong 48h - không để bạn chờ đợi</span>
               </li>
               <li className="flex items-center gap-3">
                 <CheckCircle2 className="w-6 h-6 text-accent flex-shrink-0" />
@@ -90,7 +91,7 @@ export function HeroSection() {
               </li>
               <li className="flex items-center gap-3">
                 <CheckCircle2 className="w-6 h-6 text-accent flex-shrink-0" />
-                <span className="text-white/90">Hỗ trợ 24/7, tư vấn miễn phí</span>
+                <span className="text-white/90">Hỗ trợ 24/7, tư vấn miễn phí - không phí ẩn</span>
               </li>
             </ul>
             <Button
@@ -105,8 +106,10 @@ export function HeroSection() {
 
           {/* Right Content - Consultation Form */}
           <Card id="consultation-form" className="p-6 md:p-8 bg-white shadow-2xl">
-            <h3 className="text-2xl font-bold text-primary mb-2">Đăng ký tư vấn miễn phí</h3>
-            <p className="text-muted-foreground mb-6">Để lại thông tin, chúng tôi sẽ liên hệ trong vòng 24h</p>
+            <h3 className="text-2xl font-bold text-primary mb-2">Tư vấn miễn phí - Nhận kết quả trong 24h</h3>
+            <p className="text-muted-foreground mb-6">
+              <span className="text-accent font-semibold">Hãy để lại thông tin</span> chúng tôi sẽ liên hệ với bạn ngay!
+            </p>
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Honeypot field ẩn */}
               <input
