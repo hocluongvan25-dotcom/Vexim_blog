@@ -57,14 +57,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Số điện thoại không hợp lệ." }, { status: 400 })
     }
 
-    // Cấu hình SMTP
     const transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST || "smtp.zoho.com", // Use EMAIL_HOST from Vercel
-      port: Number.parseInt(process.env.EMAIL_PORT || "465"), // Use EMAIL_PORT from Vercel
-      secure: true, // SSL
+      host: process.env.EMAIL_HOST || "smtp.zoho.com",
+      port: Number.parseInt(process.env.EMAIL_PORT || "587"),
+      secure: false, // false cho port 587 (STARTTLS)
       auth: {
-        user: process.env.EMAIL_USER, // Use EMAIL_USER from Vercel (not ZOHO_EMAIL)
-        pass: process.env.EMAIL_PASS, // Use EMAIL_PASS from Vercel (not ZOHO_PASSWORD)
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+      tls: {
+        rejectUnauthorized: false, // Allow self-signed certificates if needed
       },
     })
 
