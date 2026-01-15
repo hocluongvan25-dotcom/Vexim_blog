@@ -109,7 +109,7 @@ export default function BlogSidebar() {
           )}
         </Card>
 
-        {/* Stats Card - Now moves with form */}
+        {/* Stats Card */}
         <Card className="p-6">
           <h4 className="font-bold text-lg mb-4 text-primary">Tại sao chọn Vexim Global?</h4>
 
@@ -145,30 +145,30 @@ export default function BlogSidebar() {
             </div>
           </div>
         </Card>
+
+        {/* Services Quick Links */}
+        <Card className="p-6">
+          <h4 className="font-bold text-lg mb-4 text-primary">Dịch vụ nổi bật</h4>
+
+          <div className="space-y-3">
+            {[
+              "Đăng ký FDA thực phẩm",
+              "Cấp mã GACC Trung Quốc",
+              "Chứng nhận MFDS Hàn Quốc",
+              "Xử lý hàng bị giữ tại cảng",
+            ].map((service, idx) => (
+              <a
+                key={idx}
+                href="/dich-vu"
+                className="flex items-center gap-2 p-3 rounded-lg hover:bg-accent/5 transition-colors group"
+              >
+                <CheckCircle2 className="w-4 h-4 text-accent flex-shrink-0" />
+                <span className="text-sm group-hover:text-accent transition-colors">{service}</span>
+              </a>
+            ))}
+          </div>
+        </Card>
       </div>
-
-      {/* Services Quick Links - Remains static */}
-      <Card className="p-6">
-        <h4 className="font-bold text-lg mb-4 text-primary">Dịch vụ nổi bật</h4>
-
-        <div className="space-y-3">
-          {[
-            "Đăng ký FDA thực phẩm",
-            "Cấp mã GACC Trung Quốc",
-            "Chứng nhận MFDS Hàn Quốc",
-            "Xử lý hàng bị giữ tại cảng",
-          ].map((service, idx) => (
-            <a
-              key={idx}
-              href="/dich-vu"
-              className="flex items-center gap-2 p-3 rounded-lg hover:bg-accent/5 transition-colors group"
-            >
-              <CheckCircle2 className="w-4 h-4 text-accent flex-shrink-0" />
-              <span className="text-sm group-hover:text-accent transition-colors">{service}</span>
-            </a>
-          ))}
-        </div>
-      </Card>
     </aside>
   )
 }
