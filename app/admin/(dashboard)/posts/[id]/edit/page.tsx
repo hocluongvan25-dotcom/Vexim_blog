@@ -210,241 +210,72 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-8">
-        {/* Main Content Area */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Basic Information */}
-          <Card className="p-6">
-            <h2 className="text-xl font-bold text-primary mb-4">Thông tin cơ bản</h2>
+      <div className="max-w-5xl mx-auto space-y-6">
+        {/* Basic Information */}
+        <Card className="p-6">
+          <h2 className="text-xl font-bold text-primary mb-4">Thông tin cơ bản</h2>
 
-            <div className="space-y-4">
-              {/* Title */}
+          <div className="space-y-4">
+            {/* Title */}
+            <div>
+              <Label htmlFor="title" className="text-base font-medium">
+                Tiêu đề bài viết <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="title"
+                placeholder="Nhập tiêu đề bài viết..."
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="mt-2 text-lg"
+              />
+            </div>
+
+            {/* Excerpt */}
+            <div>
+              <Label htmlFor="excerpt" className="text-base font-medium">
+                Mô tả ngắn <span className="text-destructive">*</span>
+              </Label>
+              <p className="text-sm text-muted-foreground mt-1 mb-2">
+                Văn bản này sẽ hiển thị trong danh sách bài viết
+              </p>
+              <Textarea
+                id="excerpt"
+                placeholder="Nhập mô tả ngắn về bài viết..."
+                value={excerpt}
+                onChange={(e) => setExcerpt(e.target.value)}
+                rows={3}
+                className="resize-none"
+              />
+              <p className="text-sm text-muted-foreground mt-1">{excerpt.length}/200 ký tự</p>
+            </div>
+
+            {/* Category and Featured Image */}
+            <div className="grid md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="title" className="text-base font-medium">
-                  Tiêu đề bài viết <span className="text-destructive">*</span>
+                <Label htmlFor="category" className="text-base font-medium">
+                  Danh mục <span className="text-destructive">*</span>
                 </Label>
-                <Input
-                  id="title"
-                  placeholder="Nhập tiêu đề bài viết..."
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  className="mt-2 text-lg"
-                />
-              </div>
-
-              {/* Excerpt */}
-              <div>
-                <Label htmlFor="excerpt" className="text-base font-medium">
-                  Mô tả ngắn <span className="text-destructive">*</span>
-                </Label>
-                <p className="text-sm text-muted-foreground mt-1 mb-2">
-                  Văn bản này sẽ hiển thị trong danh sách bài viết
-                </p>
-                <Textarea
-                  id="excerpt"
-                  placeholder="Nhập mô tả ngắn về bài viết..."
-                  value={excerpt}
-                  onChange={(e) => setExcerpt(e.target.value)}
-                  rows={3}
-                  className="resize-none"
-                />
-                <p className="text-sm text-muted-foreground mt-1">{excerpt.length}/200 ký tự</p>
-              </div>
-            </div>
-          </Card>
-
-          {/* Rich Text Editor */}
-          <Card className="p-6">
-            <h2 className="text-xl font-bold text-primary mb-4">Nội dung bài viết</h2>
-
-            {/* Toolbar */}
-            <div className="flex flex-wrap gap-2 p-3 bg-secondary/50 rounded-lg mb-4 border">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => insertFormatting("bold")}
-                title="In đậm (Ctrl+B)"
-              >
-                <Bold className="w-4 h-4" />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => insertFormatting("italic")}
-                title="In nghiêng (Ctrl+I)"
-              >
-                <Italic className="w-4 h-4" />
-              </Button>
-              <div className="w-px bg-border mx-1" />
-              <Button type="button" variant="ghost" size="sm" onClick={() => insertFormatting("h2")} title="Tiêu đề H2">
-                <Heading2 className="w-4 h-4" />
-              </Button>
-              <Button type="button" variant="ghost" size="sm" onClick={() => insertFormatting("h3")} title="Tiêu đề H3">
-                <Heading3 className="w-4 h-4" />
-              </Button>
-              <div className="w-px bg-border mx-1" />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => insertFormatting("link")}
-                title="Chèn liên kết"
-              >
-                <LinkIcon className="w-4 h-4" />
-              </Button>
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={() => insertFormatting("image")}
-                title="Chèn hình ảnh"
-              >
-                <ImageIcon className="w-4 h-4" />
-              </Button>
-            </div>
-
-            {/* Content Editor */}
-            <RichTextEditor
-              value={content}
-              onChange={setContent}
-              placeholder="Nhập nội dung bài viết... Sử dụng các nút trên thanh công cụ để định dạng văn bản."
-            />
-          </Card>
-
-          {/* SEO Settings */}
-          <Card className="p-6">
-            <h2 className="text-xl font-bold text-primary mb-4">Cấu hình SEO</h2>
-
-            <div className="space-y-4">
-              <div>
-                <Label htmlFor="metaTitle">Meta Title</Label>
-                <Input
-                  id="metaTitle"
-                  placeholder="Tiêu đề SEO (tối đa 60 ký tự)"
-                  value={metaTitle}
-                  onChange={(e) => setMetaTitle(e.target.value)}
-                  maxLength={60}
-                  className="mt-2"
-                />
-                <p className="text-sm text-muted-foreground mt-1">{metaTitle.length}/60 ký tự</p>
+                <Select value={category} onValueChange={setCategory}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue placeholder="Chọn danh mục..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="FDA">FDA (Mỹ)</SelectItem>
+                    <SelectItem value="GACC">GACC (Trung Quốc)</SelectItem>
+                    <SelectItem value="MFDS">MFDS (Hàn Quốc)</SelectItem>
+                    <SelectItem value="Dịch vụ Agent Hoa Kỳ">Dịch vụ Agent Hoa Kỳ</SelectItem>
+                    <SelectItem value="Truy xuất nguồn gốc">Truy xuất nguồn gốc</SelectItem>
+                    <SelectItem value="Ủy thác xuất nhập khẩu">Ủy thác XNK</SelectItem>
+                    <SelectItem value="Tin tức thị trường">Tin tức thị trường</SelectItem>
+                    <SelectItem value="Xuất nhập khẩu">Xuất nhập khẩu</SelectItem>
+                    <SelectItem value="Kiến thức pháp lý">Kiến thức pháp lý</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>
-                <Label htmlFor="metaDescription">Meta Description</Label>
-                <Textarea
-                  id="metaDescription"
-                  placeholder="Mô tả SEO (tối đa 160 ký tự)"
-                  value={metaDescription}
-                  onChange={(e) => setMetaDescription(e.target.value)}
-                  maxLength={160}
-                  rows={3}
-                  className="mt-2 resize-none"
-                />
-                <p className="text-sm text-muted-foreground mt-1">{metaDescription.length}/160 ký tự</p>
-              </div>
-            </div>
-          </Card>
-        </div>
-
-        {/* Sidebar */}
-        <div className="lg:col-span-1 space-y-6">
-          {/* Publish Actions */}
-          <Card className="p-6">
-            <h3 className="font-bold text-primary mb-4">Cập nhật</h3>
-
-            <div className="space-y-3">
-              <Button
-                onClick={() => handleSubmit("draft")}
-                variant="outline"
-                className="w-full justify-start bg-transparent"
-                disabled={isLoading}
-              >
-                {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
-                Lưu nháp
-              </Button>
-
-              <Button
-                onClick={() => alert("Tính năng xem trước đang phát triển")}
-                variant="outline"
-                className="w-full justify-start bg-transparent"
-                disabled={isLoading}
-              >
-                <Eye className="w-4 h-4 mr-2" />
-                Xem trước
-              </Button>
-
-              <Button
-                onClick={() => handleSubmit("published")}
-                className="w-full justify-start bg-accent hover:bg-accent/90"
-                disabled={isLoading}
-              >
-                {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
-                {status === "published" ? "Cập nhật" : "Xuất bản"}
-              </Button>
-            </div>
-          </Card>
-
-          {/* SEO Checker */}
-          <SEOChecker
-            title={title}
-            excerpt={excerpt}
-            content={content}
-            metaTitle={metaTitle}
-            metaDescription={metaDescription}
-            featuredImage={featuredImage}
-          />
-
-          {/* Category */}
-          <Card className="p-6">
-            <h3 className="font-bold text-primary mb-4">
-              Danh mục <span className="text-destructive">*</span>
-            </h3>
-
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger>
-                <SelectValue placeholder="Chọn danh mục..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="FDA">FDA (Mỹ)</SelectItem>
-                <SelectItem value="GACC">GACC (Trung Quốc)</SelectItem>
-                <SelectItem value="MFDS">MFDS (Hàn Quốc)</SelectItem>
-                <SelectItem value="Dịch vụ Agent Hoa Kỳ">Dịch vụ Agent Hoa Kỳ</SelectItem>
-                <SelectItem value="Truy xuất nguồn gốc">Truy xuất nguồn gốc</SelectItem>
-                <SelectItem value="Ủy thác xuất nhập khẩu">Ủy thác XNK</SelectItem>
-                <SelectItem value="Tin tức thị trường">Tin tức thị trường</SelectItem>
-                <SelectItem value="Xuất nhập khẩu">Xuất nhập khẩu</SelectItem>
-                <SelectItem value="Kiến thức pháp lý">Kiến thức pháp lý</SelectItem>
-              </SelectContent>
-            </Select>
-          </Card>
-
-          {/* Featured Image */}
-          <Card className="p-6">
-            <h3 className="font-bold text-primary mb-4">Ảnh bìa</h3>
-
-            <div className="space-y-4">
-              {previewImage && (
-                <div className="aspect-video overflow-hidden rounded-lg border">
-                  <img src={previewImage || "/placeholder.svg"} alt="Preview" className="w-full h-full object-cover" />
-                </div>
-              )}
-
-              <div>
-                <Label htmlFor="imageUpload" className="cursor-pointer">
-                  <div className="border-2 border-dashed border-border rounded-lg p-6 text-center hover:border-accent transition-colors">
-                    <ImageIcon className="w-8 h-8 mx-auto mb-2 text-muted-foreground" />
-                    <p className="text-sm text-muted-foreground">Click để tải ảnh lên</p>
-                    <p className="text-xs text-muted-foreground mt-1">PNG, JPG, WEBP (tối đa 5MB)</p>
-                  </div>
-                </Label>
-                <Input id="imageUpload" type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
-              </div>
-
-              <div>
-                <Label htmlFor="imageUrl" className="text-sm">
-                  Hoặc nhập URL
+                <Label htmlFor="imageUrl" className="text-base font-medium">
+                  Ảnh bìa (URL)
                 </Label>
                 <Input
                   id="imageUrl"
@@ -458,8 +289,144 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
                 />
               </div>
             </div>
-          </Card>
-        </div>
+
+            {previewImage && (
+              <div className="aspect-video max-w-md overflow-hidden rounded-lg border">
+                <img src={previewImage || "/placeholder.svg"} alt="Preview" className="w-full h-full object-cover" />
+              </div>
+            )}
+          </div>
+        </Card>
+
+        {/* Rich Text Editor */}
+        <Card className="p-6">
+          <h2 className="text-xl font-bold text-primary mb-4">Nội dung bài viết</h2>
+
+          {/* Toolbar */}
+          <div className="flex flex-wrap gap-2 p-3 bg-secondary/50 rounded-lg mb-4 border">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting("bold")}
+              title="In đậm (Ctrl+B)"
+            >
+              <Bold className="w-4 h-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting("italic")}
+              title="In nghiêng (Ctrl+I)"
+            >
+              <Italic className="w-4 h-4" />
+            </Button>
+            <div className="w-px bg-border mx-1" />
+            <Button type="button" variant="ghost" size="sm" onClick={() => insertFormatting("h2")} title="Tiêu đề H2">
+              <Heading2 className="w-4 h-4" />
+            </Button>
+            <Button type="button" variant="ghost" size="sm" onClick={() => insertFormatting("h3")} title="Tiêu đề H3">
+              <Heading3 className="w-4 h-4" />
+            </Button>
+            <div className="w-px bg-border mx-1" />
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting("link")}
+              title="Chèn liên kết"
+            >
+              <LinkIcon className="w-4 h-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              onClick={() => insertFormatting("image")}
+              title="Chèn hình ảnh"
+            >
+              <ImageIcon className="w-4 h-4" />
+            </Button>
+          </div>
+
+          {/* Content Editor */}
+          <RichTextEditor
+            value={content}
+            onChange={setContent}
+            placeholder="Nhập nội dung bài viết... Sử dụng các nút trên thanh công cụ để định dạng văn bản."
+          />
+        </Card>
+
+        {/* SEO Settings */}
+        <Card className="p-6">
+          <h2 className="text-xl font-bold text-primary mb-4">Cấu hình SEO</h2>
+
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="metaTitle">Meta Title</Label>
+              <Input
+                id="metaTitle"
+                placeholder="Tiêu đề SEO (tối đa 60 ký tự)"
+                value={metaTitle}
+                onChange={(e) => setMetaTitle(e.target.value)}
+                maxLength={60}
+                className="mt-2"
+              />
+              <p className="text-sm text-muted-foreground mt-1">{metaTitle.length}/60 ký tự</p>
+            </div>
+
+            <div>
+              <Label htmlFor="metaDescription">Meta Description</Label>
+              <Textarea
+                id="metaDescription"
+                placeholder="Mô tả SEO (tối đa 160 ký tự)"
+                value={metaDescription}
+                onChange={(e) => setMetaDescription(e.target.value)}
+                maxLength={160}
+                rows={3}
+                className="mt-2 resize-none"
+              />
+              <p className="text-sm text-muted-foreground mt-1">{metaDescription.length}/160 ký tự</p>
+            </div>
+          </div>
+
+          {/* Inline SEO Checker */}
+          <div className="mt-6">
+            <SEOChecker
+              title={title}
+              excerpt={excerpt}
+              content={content}
+              metaTitle={metaTitle}
+              metaDescription={metaDescription}
+              featuredImage={featuredImage}
+            />
+          </div>
+        </Card>
+
+        {/* Action Buttons */}
+        <Card className="p-6">
+          <div className="flex flex-wrap gap-3">
+            <Button onClick={() => handleSubmit("draft")} variant="outline" disabled={isLoading}>
+              {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+              Lưu nháp
+            </Button>
+
+            <Button onClick={() => alert("Tính năng xem trước đang phát triển")} variant="outline" disabled={isLoading}>
+              <Eye className="w-4 h-4 mr-2" />
+              Xem trước
+            </Button>
+
+            <Button
+              onClick={() => handleSubmit("published")}
+              className="bg-accent hover:bg-accent/90"
+              disabled={isLoading}
+            >
+              {isLoading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
+              {status === "published" ? "Cập nhật" : "Xuất bản"}
+            </Button>
+          </div>
+        </Card>
       </div>
     </div>
   )
