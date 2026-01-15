@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { LayoutDashboard, FileText, PlusCircle, Settings, Globe, LogOut, User } from "lucide-react"
+import { LayoutDashboard, FileText, PlusCircle, Settings, Globe, LogOut, User, Newspaper } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { createClient } from "@/lib/supabase/client"
@@ -36,6 +36,11 @@ export function AdminSidebar({ adminUser }: AdminSidebarProps) {
       title: "Tạo bài viết mới",
       href: "/admin/posts/new",
       icon: PlusCircle,
+    },
+    {
+      title: "Tin tức FDA/GACC",
+      href: "/admin/news-crawler",
+      icon: Newspaper,
     },
     {
       title: "Cài đặt",
