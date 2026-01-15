@@ -9,6 +9,7 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { BlogShareButtons } from "@/components/blog-share-buttons"
 import { RelatedPosts } from "@/components/related-posts"
+import BlogSidebar from "@/components/blog-sidebar"
 
 export const revalidate = 60
 
@@ -121,66 +122,79 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       <BlogShareButtons />
       <main className="min-h-screen pt-20 md:pt-24">
         <article className="py-8 md:py-12">
-          <div className="container mx-auto px-4 max-w-6xl">
-            <Link href="/blog" className="hidden md:inline-block">
-              <Button variant="ghost" className="mb-8 -ml-4">
+          <div className="container mx-auto px-4">
+            <Link href="/blog" className="hidden md:inline-block mb-8">
+              <Button variant="ghost" className="-ml-4">
                 <ArrowLeft className="w-4 h-4 mr-2" />
                 Quay lại Blog
               </Button>
             </Link>
 
-            <div className="mb-4 md:mt-0">
-              <span className="inline-block bg-accent/10 text-accent px-4 py-1.5 rounded-full text-sm font-medium">
-                {post.category}
-              </span>
-            </div>
+            {/* Grid layout with content and sidebar */}
+            <div className="grid grid-cols-1 lg:grid-cols-[1fr_350px] gap-8 xl:gap-12">
+              {/* Main Content */}
+              <div className="min-w-0">
+                <div className="mb-4">
+                  <span className="inline-block bg-accent/10 text-accent px-4 py-1.5 rounded-full text-sm font-medium">
+                    {post.category}
+                  </span>
+                </div>
 
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary mb-6 text-balance">{post.title}</h1>
+                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-primary mb-6 text-balance">
+                  {post.title}
+                </h1>
 
-            <div className="flex flex-wrap items-center gap-6 text-muted-foreground mb-8 pb-8 border-b">
-              <div className="flex items-center gap-2">
-                <User className="w-5 h-5" />
-                <span className="font-medium">Vexim Global</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Calendar className="w-5 h-5" />
-                <span>{formatDate(post.published_at)}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Clock className="w-5 h-5" />
-                <span>{readingTime} phút đọc</span>
-              </div>
-            </div>
+                <div className="flex flex-wrap items-center gap-6 text-muted-foreground mb-8 pb-8 border-b">
+                  <div className="flex items-center gap-2">
+                    <User className="w-5 h-5" />
+                    <span className="font-medium">Vexim Global</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-5 h-5" />
+                    <span>{formatDate(post.published_at)}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-5 h-5" />
+                    <span>{readingTime} phút đọc</span>
+                  </div>
+                </div>
 
-            {post.featured_image && (
-              <div className="aspect-video overflow-hidden rounded-lg mb-12">
-                <img
-                  src={post.featured_image || "/placeholder.svg"}
-                  alt={post.title}
-                  className="w-full h-full object-cover"
+                {post.featured_image && (
+                  <div className="aspect-video overflow-hidden rounded-lg mb-12">
+                    <img
+                      src={post.featured_image || "/placeholder.svg"}
+                      alt={post.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+
+                <div
+                  className="prose prose-lg max-w-none prose-headings:text-primary prose-h2:text-3xl prose-h2:font-bold prose-h2:mb-4 prose-h2:mt-8 prose-h3:text-2xl prose-h3:font-bold prose-h3:mb-3 prose-h3:mt-6 prose-p:text-base prose-p:leading-relaxed prose-p:mb-4 prose-ul:my-4 prose-li:text-base prose-li:leading-relaxed prose-a:text-accent prose-a:underline hover:prose-a:opacity-80"
+                  dangerouslySetInnerHTML={{ __html: post.content }}
                 />
+
+                <div className="mt-16 p-8 bg-gradient-to-br from-primary to-primary/90 rounded-lg text-white text-center">
+                  <h3 className="text-2xl font-bold mb-4">Cần tư vấn thêm về dịch vụ này?</h3>
+                  <p className="text-white/90 mb-6 max-w-2xl mx-auto leading-relaxed">
+                    Đội ngũ chuyên gia của Vexim Global sẵn sàng hỗ trợ bạn với hơn 10 năm kinh nghiệm trong lĩnh vực
+                    xuất nhập khẩu
+                  </p>
+                  <ConsultationDialog>
+                    <Button size="lg" className="bg-accent hover:bg-accent/90 text-white">
+                      Liên hệ tư vấn miễn phí
+                    </Button>
+                  </ConsultationDialog>
+                </div>
+
+                <RelatedPosts currentPostId={post.id} category={post.category} />
               </div>
-            )}
 
-            <div
-              className="prose prose-lg prose-headings:text-primary prose-h2:text-3xl prose-h2:font-bold prose-h2:mb-4 prose-h2:mt-8 prose-h3:text-2xl prose-h3:font-bold prose-h3:mb-3 prose-h3:mt-6 prose-p:text-base prose-p:leading-relaxed prose-p:mb-4 prose-ul:my-4 prose-li:text-base prose-li:leading-relaxed prose-a:text-accent prose-a:underline hover:prose-a:opacity-80"
-              dangerouslySetInnerHTML={{ __html: post.content }}
-            />
-
-            <div className="mt-16 p-8 bg-gradient-to-br from-primary to-primary/90 rounded-lg text-white text-center">
-              <h3 className="text-2xl font-bold mb-4">Cần tư vấn thêm về dịch vụ này?</h3>
-              <p className="text-white/90 mb-6 max-w-2xl mx-auto leading-relaxed">
-                Đội ngũ chuyên gia của Vexim Global sẵn sàng hỗ trợ bạn với hơn 10 năm kinh nghiệm trong lĩnh vực xuất
-                nhập khẩu
-              </p>
-              <ConsultationDialog>
-                <Button size="lg" className="bg-accent hover:bg-accent/90 text-white">
-                  Liên hệ tư vấn miễn phí
-                </Button>
-              </ConsultationDialog>
+              {/* Sidebar - Hidden on mobile, shown on large screens */}
+              <div className="hidden lg:block">
+                <BlogSidebar />
+              </div>
             </div>
-
-            <RelatedPosts currentPostId={post.id} category={post.category} />
           </div>
         </article>
       </main>
