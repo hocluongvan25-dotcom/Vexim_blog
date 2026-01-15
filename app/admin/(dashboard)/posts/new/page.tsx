@@ -143,9 +143,9 @@ export default function NewPostPage() {
         <p className="text-muted-foreground">Thêm nội dung mới vào hệ thống blog của Vexim Global</p>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-8">
-        {/* Main Content - Left Side (2 columns) */}
-        <div className="lg:col-span-2 space-y-6">
+      <div className="grid lg:grid-cols-[4fr_1fr] gap-8">
+        {/* Main Content - Left Side */}
+        <div className="space-y-6">
           {/* Basic Information */}
           <Card className="p-6">
             <h2 className="text-xl font-bold text-primary mb-4">Thông tin cơ bản</h2>
@@ -289,9 +289,10 @@ export default function NewPostPage() {
           </Card>
         </div>
 
+        {/* Sidebar - Right Side */}
         <div className="space-y-6">
           {/* SEO Checker Card */}
-          <Card className="p-6 sticky top-24">
+          <Card className="p-6">
             <h3 className="text-lg font-bold text-primary mb-4">Phân tích SEO</h3>
             <SEOChecker
               title={title}
@@ -304,7 +305,7 @@ export default function NewPostPage() {
           </Card>
 
           {/* Action Buttons Card */}
-          <Card className="p-6 sticky top-[500px]">
+          <Card className="p-6 sticky top-24">
             <h3 className="text-lg font-bold text-primary mb-4">Hành động</h3>
             <div className="flex flex-col gap-3">
               <Button onClick={() => handleSubmit("draft")} variant="outline" disabled={isLoading} className="w-full">

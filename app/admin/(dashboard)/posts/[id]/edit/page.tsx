@@ -210,179 +210,161 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-3 gap-8">
-        {/* Main Content - Left Side (2 columns) */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="max-w-5xl mx-auto space-y-6">
-            {/* Basic Information */}
-            <Card className="p-6">
-              <h2 className="text-xl font-bold text-primary mb-4">Thông tin cơ bản</h2>
+      <div className="grid lg:grid-cols-[4fr_1fr] gap-8">
+        {/* Main Content - Left Side */}
+        <div className="space-y-6">
+          {/* Basic Information */}
+          <Card className="p-6">
+            <h2 className="text-xl font-bold text-primary mb-4">Thông tin cơ bản</h2>
 
-              <div className="space-y-4">
-                {/* Title */}
+            <div className="space-y-4">
+              {/* Title */}
+              <div>
+                <Label htmlFor="title" className="text-base font-medium">
+                  Tiêu đề bài viết <span className="text-destructive">*</span>
+                </Label>
+                <Input
+                  id="title"
+                  placeholder="Nhập tiêu đề bài viết..."
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  className="mt-2 text-lg"
+                />
+              </div>
+
+              {/* Excerpt */}
+              <div>
+                <Label htmlFor="excerpt" className="text-base font-medium">
+                  Mô tả ngắn <span className="text-destructive">*</span>
+                </Label>
+                <p className="text-sm text-muted-foreground mt-1 mb-2">
+                  Văn bản này sẽ hiển thị trong danh sách bài viết
+                </p>
+                <Textarea
+                  id="excerpt"
+                  placeholder="Nhập mô tả ngắn về bài viết..."
+                  value={excerpt}
+                  onChange={(e) => setExcerpt(e.target.value)}
+                  rows={3}
+                  className="resize-none"
+                />
+                <p className="text-sm text-muted-foreground mt-1">{excerpt.length}/200 ký tự</p>
+              </div>
+
+              {/* Category and Featured Image */}
+              <div className="grid md:grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="title" className="text-base font-medium">
-                    Tiêu đề bài viết <span className="text-destructive">*</span>
+                  <Label htmlFor="category" className="text-base font-medium">
+                    Danh mục <span className="text-destructive">*</span>
+                  </Label>
+                  <Select value={category} onValueChange={setCategory}>
+                    <SelectTrigger className="mt-2">
+                      <SelectValue placeholder="Chọn danh mục..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="FDA">FDA (Mỹ)</SelectItem>
+                      <SelectItem value="GACC">GACC (Trung Quốc)</SelectItem>
+                      <SelectItem value="MFDS">MFDS (Hàn Quốc)</SelectItem>
+                      <SelectItem value="Dịch vụ Agent Hoa Kỳ">Dịch vụ Agent Hoa Kỳ</SelectItem>
+                      <SelectItem value="Truy xuất nguồn gốc">Truy xuất nguồn gốc</SelectItem>
+                      <SelectItem value="Ủy thác xuất nhập khẩu">Ủy thác XNK</SelectItem>
+                      <SelectItem value="Tin tức thị trường">Tin tức thị trường</SelectItem>
+                      <SelectItem value="Xuất nhập khẩu">Xuất nhập khẩu</SelectItem>
+                      <SelectItem value="Kiến thức pháp lý">Kiến thức pháp lý</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="imageUrl" className="text-base font-medium">
+                    Ảnh bìa (URL)
                   </Label>
                   <Input
-                    id="title"
-                    placeholder="Nhập tiêu đề bài viết..."
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className="mt-2 text-lg"
+                    id="imageUrl"
+                    placeholder="https://..."
+                    value={featuredImage}
+                    onChange={(e) => {
+                      setFeaturedImage(e.target.value)
+                      setPreviewImage(e.target.value)
+                    }}
+                    className="mt-2"
                   />
                 </div>
-
-                {/* Excerpt */}
-                <div>
-                  <Label htmlFor="excerpt" className="text-base font-medium">
-                    Mô tả ngắn <span className="text-destructive">*</span>
-                  </Label>
-                  <p className="text-sm text-muted-foreground mt-1 mb-2">
-                    Văn bản này sẽ hiển thị trong danh sách bài viết
-                  </p>
-                  <Textarea
-                    id="excerpt"
-                    placeholder="Nhập mô tả ngắn về bài viết..."
-                    value={excerpt}
-                    onChange={(e) => setExcerpt(e.target.value)}
-                    rows={3}
-                    className="resize-none"
-                  />
-                  <p className="text-sm text-muted-foreground mt-1">{excerpt.length}/200 ký tự</p>
-                </div>
-
-                {/* Category and Featured Image */}
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="category" className="text-base font-medium">
-                      Danh mục <span className="text-destructive">*</span>
-                    </Label>
-                    <Select value={category} onValueChange={setCategory}>
-                      <SelectTrigger className="mt-2">
-                        <SelectValue placeholder="Chọn danh mục..." />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="FDA">FDA (Mỹ)</SelectItem>
-                        <SelectItem value="GACC">GACC (Trung Quốc)</SelectItem>
-                        <SelectItem value="MFDS">MFDS (Hàn Quốc)</SelectItem>
-                        <SelectItem value="Dịch vụ Agent Hoa Kỳ">Dịch vụ Agent Hoa Kỳ</SelectItem>
-                        <SelectItem value="Truy xuất nguồn gốc">Truy xuất nguồn gốc</SelectItem>
-                        <SelectItem value="Ủy thác xuất nhập khẩu">Ủy thác XNK</SelectItem>
-                        <SelectItem value="Tin tức thị trường">Tin tức thị trường</SelectItem>
-                        <SelectItem value="Xuất nhập khẩu">Xuất nhập khẩu</SelectItem>
-                        <SelectItem value="Kiến thức pháp lý">Kiến thức pháp lý</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label htmlFor="imageUrl" className="text-base font-medium">
-                      Ảnh bìa (URL)
-                    </Label>
-                    <Input
-                      id="imageUrl"
-                      placeholder="https://..."
-                      value={featuredImage}
-                      onChange={(e) => {
-                        setFeaturedImage(e.target.value)
-                        setPreviewImage(e.target.value)
-                      }}
-                      className="mt-2"
-                    />
-                  </div>
-                </div>
-
-                {previewImage && (
-                  <div className="aspect-video max-w-md overflow-hidden rounded-lg border">
-                    <img
-                      src={previewImage || "/placeholder.svg"}
-                      alt="Preview"
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                )}
-              </div>
-            </Card>
-
-            {/* Rich Text Editor */}
-            <Card className="p-6">
-              <h2 className="text-xl font-bold text-primary mb-4">Nội dung bài viết</h2>
-
-              {/* Toolbar */}
-              <div className="flex flex-wrap gap-2 p-3 bg-secondary/50 rounded-lg mb-4 border">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => insertFormatting("bold")}
-                  title="In đậm (Ctrl+B)"
-                >
-                  <Bold className="w-4 h-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => insertFormatting("italic")}
-                  title="In nghiêng (Ctrl+I)"
-                >
-                  <Italic className="w-4 h-4" />
-                </Button>
-                <div className="w-px bg-border mx-1" />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => insertFormatting("h2")}
-                  title="Tiêu đề H2"
-                >
-                  <Heading2 className="w-4 h-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => insertFormatting("h3")}
-                  title="Tiêu đề H3"
-                >
-                  <Heading3 className="w-4 h-4" />
-                </Button>
-                <div className="w-px bg-border mx-1" />
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => insertFormatting("link")}
-                  title="Chèn liên kết"
-                >
-                  <LinkIcon className="w-4 h-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => insertFormatting("image")}
-                  title="Chèn hình ảnh"
-                >
-                  <ImageIcon className="w-4 h-4" />
-                </Button>
               </div>
 
-              {/* Content Editor */}
-              <RichTextEditor
-                value={content}
-                onChange={setContent}
-                placeholder="Nhập nội dung bài viết... Sử dụng các nút trên thanh công cụ để định dạng văn bản."
-              />
-            </Card>
-          </div>
+              {previewImage && (
+                <div className="aspect-video max-w-md overflow-hidden rounded-lg border">
+                  <img src={previewImage || "/placeholder.svg"} alt="Preview" className="w-full h-full object-cover" />
+                </div>
+              )}
+            </div>
+          </Card>
+
+          {/* Rich Text Editor */}
+          <Card className="p-6">
+            <h2 className="text-xl font-bold text-primary mb-4">Nội dung bài viết</h2>
+
+            {/* Toolbar */}
+            <div className="flex flex-wrap gap-2 p-3 bg-secondary/50 rounded-lg mb-4 border">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => insertFormatting("bold")}
+                title="In đậm (Ctrl+B)"
+              >
+                <Bold className="w-4 h-4" />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => insertFormatting("italic")}
+                title="In nghiêng (Ctrl+I)"
+              >
+                <Italic className="w-4 h-4" />
+              </Button>
+              <div className="w-px bg-border mx-1" />
+              <Button type="button" variant="ghost" size="sm" onClick={() => insertFormatting("h2")} title="Tiêu đề H2">
+                <Heading2 className="w-4 h-4" />
+              </Button>
+              <Button type="button" variant="ghost" size="sm" onClick={() => insertFormatting("h3")} title="Tiêu đề H3">
+                <Heading3 className="w-4 h-4" />
+              </Button>
+              <div className="w-px bg-border mx-1" />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => insertFormatting("link")}
+                title="Chèn liên kết"
+              >
+                <LinkIcon className="w-4 h-4" />
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => insertFormatting("image")}
+                title="Chèn hình ảnh"
+              >
+                <ImageIcon className="w-4 h-4" />
+              </Button>
+            </div>
+
+            {/* Content Editor */}
+            <RichTextEditor
+              value={content}
+              onChange={setContent}
+              placeholder="Nhập nội dung bài viết... Sử dụng các nút trên thanh công cụ để định dạng văn bản."
+            />
+          </Card>
         </div>
 
-        {/* Sidebar - Right Side (1 column) */}
+        {/* Sidebar - Right Side */}
         <div className="space-y-6">
           {/* SEO Checker Card */}
-          <Card className="p-6 sticky top-24">
+          <Card className="p-6">
             <h3 className="text-lg font-bold text-primary mb-4">Phân tích SEO</h3>
             <SEOChecker
               title={title}
@@ -395,7 +377,7 @@ export default function EditPostPage({ params }: { params: Promise<{ id: string 
           </Card>
 
           {/* Action Buttons Card */}
-          <Card className="p-6 sticky top-[500px]">
+          <Card className="p-6 sticky top-24">
             <h3 className="text-lg font-bold text-primary mb-4">Hành động</h3>
             <div className="flex flex-col gap-3">
               <Button onClick={() => handleSubmit("draft")} variant="outline" disabled={isLoading} className="w-full">
