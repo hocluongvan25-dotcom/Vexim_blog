@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Menu, X, Shield } from "lucide-react"
 import { ConsultationDialog } from "@/components/consultation-dialog"
 import Link from "next/link"
+import { BlogSearch } from "@/components/blog-search"
 
 export function Header() {
   const [isScrolled, setIsScrolled] = useState(false)
@@ -91,6 +92,9 @@ export function Header() {
           {isMobileMenuOpen && (
             <nav className="md:hidden py-4 border-t">
               <div className="flex flex-col gap-4">
+                <div className="pb-2">
+                  <BlogSearch />
+                </div>
                 <Link
                   href="/#services"
                   onClick={() => setIsMobileMenuOpen(false)}

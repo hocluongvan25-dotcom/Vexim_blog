@@ -3,7 +3,7 @@ import { Users, Clock, DollarSign, Headphones } from "lucide-react"
 const benefits = [
   {
     icon: Users,
-    title: "Đội ngũ chuyên gia pháp lý",
+    title: "Đội ngũ chuyên gia pháp lý xuất nhập khẩu",
     description:
       "Đội ngũ tư vấn viên được đào tạo chuyên sâu về luật thương mại quốc tế, với kinh nghiệm xử lý hồ sơ cho nhiều doanh nghiệp xuất khẩu nông sản, thủy sản, mỹ phẩm.",
   },
@@ -11,11 +11,11 @@ const benefits = [
     icon: Clock,
     title: "Cam kết thời gian xử lý hồ sơ",
     description:
-      "FDA 5-10 ngày, GACC 20-40 ngày, MFDS 30-45 ngày làm việc. Cam kết hoàn phí nếu chậm tiến độ do lỗi của chúng tôi, theo điều khoản hợp đồng.",
+      "FDA 5-10 ngày, GACC 20-30 ngày, MFDS 30-45 ngày làm việc. Cam kết hoàn phí nếu chậm tiến độ do lỗi của chúng tôi, theo điều khoản hợp đồng.",
   },
   {
     icon: DollarSign,
-    title: "Minh bạch chi phí",
+    title: "Minh bạch chi phí và hợp đồng rõ ràng",
     description:
       "Báo giá chi tiết từng hạng mục. Hợp đồng dịch vụ ghi rõ quyền lợi và nghĩa vụ của hai bên. Cam kết không phát sinh chi phí ngoài thỏa thuận ban đầu.",
   },

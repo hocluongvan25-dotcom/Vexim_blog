@@ -4,16 +4,31 @@ import { createStaticClient } from "@/lib/supabase/server"
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = createStaticClient()
 
-  // Fetch all published posts
-  const { data: posts } = await supabase
-    .from("posts")
-    .select("slug, published_at, updated_at")
-    .eq("status", "published")
-    .order("published_at", { ascending: false })
+  let blogPages: MetadataRoute.Sitemap = []
+
+  if (supabase) {
+    try {
+      const { data: posts } = await supabase
+        .from("posts")
+        .select("slug, published_at, updated_at")
+        .eq("status", "published")
+        .order("published_at", { ascending: false })
+
+      blogPages =
+        posts?.map((post) => ({
+          url: `${baseUrl}/blog/${post.slug}`,
+          lastModified: new Date(post.updated_at || post.published_at),
+          changeFrequency: "monthly" as const,
+          priority: 0.7,
+        })) || []
+    } catch (error) {
+      console.error("[v0] Error fetching posts for sitemap:", error)
+      // Continue with just static pages
+    }
+  }
 
   const baseUrl = "https://vexim.vn"
 
-  // Static pages
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
@@ -64,15 +79,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
   ]
-
-  // Blog posts
-  const blogPages: MetadataRoute.Sitemap =
-    posts?.map((post) => ({
-      url: `${baseUrl}/blog/${post.slug}`,
-      lastModified: new Date(post.updated_at || post.published_at),
-      changeFrequency: "monthly" as const,
-      priority: 0.7,
-    })) || []
 
   return [...staticPages, ...blogPages]
 }

@@ -1,0 +1,403 @@
+import { getSupabaseServerClient } from "./supabase-server"
+import { generateText } from "ai"
+
+interface CrawlConfig {
+  source: "FDA" | "GACC"
+  url: string
+  selectors: {
+    container: string
+    title: string
+    link: string
+    date?: string
+    content?: string
+  }
+}
+
+interface FilterKeywords {
+  layer1_must: string[]
+  layer2_should: string[]
+  layer3_exclude: string[]
+}
+
+const FILTER_KEYWORDS: FilterKeywords = {
+  layer1_must: [
+    "thực phẩm",
+    "food",
+    "xuất khẩu",
+    "export",
+    "nhập khẩu",
+    "import",
+    "chứng nhận",
+    "certification",
+    "giấy phép",
+    "license",
+    "FDA",
+    "GACC",
+    "MFDS",
+    "an toàn thực phẩm",
+    "food safety",
+    "quy định",
+    "regulation",
+    "tiêu chuẩn",
+    "standard",
+    "kiểm tra",
+    "inspection",
+    "hải quan",
+    "customs",
+  ],
+  layer2_should: [
+    "nông sản",
+    "agricultural",
+    "thủy sản",
+    "seafood",
+    "chế biến",
+    "processed",
+    "đóng gói",
+    "packaging",
+    "nhãn mác",
+    "labeling",
+    "Process Filing",
+    "US Agent",
+    "Prior Notice",
+    "FSVP",
+    "进口",
+    "出口",
+    "食品",
+    "农产品",
+    "水产品",
+    "认证",
+    "检验检疫",
+    "备案",
+  ],
+  layer3_exclude: [
+    "dược phẩm",
+    "pharmaceutical",
+    "thiết bị y tế",
+    "medical device",
+    "mỹ phẩm không liên quan thực phẩm",
+    "cosmetics unrelated to food",
+    "thú y không liên quan xuất nhập",
+    "veterinary unrelated to export",
+    "药品",
+    "医疗器械",
+    "化妆品",
+  ],
+}
+
+const CRAWL_CONFIGS: CrawlConfig[] = [
+  {
+    source: "FDA",
+    url: "https://www.fda.gov/news-events/fda-newsroom/press-announcements",
+    selectors: {
+      container: ".views-row",
+      title: ".views-field-title a",
+      link: ".views-field-title a",
+      date: ".views-field-field-release-date",
+    },
+  },
+  {
+    source: "GACC",
+    url: "http://www.customs.gov.cn/customs/302249/2480148/index.html",
+    selectors: {
+      container: ".news-list li",
+      title: "a",
+      link: "a",
+      date: ".date",
+    },
+  },
+]
+
+export async function crawlNews(source: "FDA" | "GACC") {
+  const supabase = await getSupabaseServerClient()
+
+  // Create crawl log
+  const { data: logData, error: logError } = await supabase
+    .from("crawl_logs")
+    .insert({
+      source,
+      status: "running",
+    })
+    .select()
+    .single()
+
+  if (logError) {
+    console.error("[v0] Error creating crawl log:", logError)
+    throw new Error("Failed to create crawl log")
+  }
+
+  const logId = logData.id
+
+  try {
+    const config = CRAWL_CONFIGS.find((c) => c.source === source)
+    if (!config) {
+      throw new Error(`No config found for source: ${source}`)
+    }
+
+    // Fetch the page content
+    const response = await fetch(config.url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; VeximGlobalBot/1.0)",
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch ${source}: ${response.statusText}`)
+    }
+
+    const html = await response.text()
+
+    // Parse HTML (simple regex-based parsing for demo)
+    const articles = await parseHTML(html, config)
+
+    console.log(`[v0] Found ${articles.length} articles from ${source}`)
+
+    let articlesFiltered = 0
+
+    // Process each article
+    for (const article of articles) {
+      // Check if article already exists
+      const { data: existing } = await supabase.from("news_articles").select("id").eq("url", article.url).single()
+
+      if (existing) {
+        console.log(`[v0] Article already exists: ${article.title}`)
+        continue
+      }
+
+      // Apply AI filtering
+      const filterResult = await filterArticleWithAI(article)
+
+      if (filterResult.isRelevant) {
+        // Insert article into database
+        const { error: insertError } = await supabase.from("news_articles").insert({
+          source,
+          title: article.title,
+          url: article.url,
+          published_date: article.publishedDate,
+          content: article.content,
+          summary: filterResult.summary,
+          category: filterResult.category,
+          relevance_score: filterResult.relevanceScore,
+          filter_layer: filterResult.filterLayer,
+          keywords: filterResult.keywords,
+          status: "pending",
+          raw_html: article.rawHtml,
+        })
+
+        if (insertError) {
+          console.error("[v0] Error inserting article:", insertError)
+        } else {
+          articlesFiltered++
+          console.log(`[v0] Added article: ${article.title}`)
+        }
+      }
+    }
+
+    // Update crawl log
+    await supabase
+      .from("crawl_logs")
+      .update({
+        completed_at: new Date().toISOString(),
+        status: "completed",
+        articles_found: articles.length,
+        articles_filtered: articlesFiltered,
+      })
+      .eq("id", logId)
+
+    return {
+      success: true,
+      articlesFound: articles.length,
+      articlesFiltered,
+    }
+  } catch (error: any) {
+    // Update crawl log with error
+    await supabase
+      .from("crawl_logs")
+      .update({
+        completed_at: new Date().toISOString(),
+        status: "failed",
+        error_message: error.message,
+      })
+      .eq("id", logId)
+
+    throw error
+  }
+}
+
+async function parseHTML(html: string, config: CrawlConfig) {
+  // This is a simplified parser. In production, use a proper HTML parser like cheerio
+  const articles: any[] = []
+
+  // Extract links using regex (simplified)
+  const linkRegex = /<a[^>]*href=["']([^"']+)["'][^>]*>([^<]+)<\/a>/gi
+  let match
+  let count = 0
+
+  while ((match = linkRegex.exec(html)) !== null && count < 20) {
+    const url = match[1]
+    const title = match[2].trim()
+
+    // Skip empty or invalid URLs
+    if (!url || !title || title.length < 10) continue
+
+    // Make URL absolute
+    let fullUrl = url
+    if (url.startsWith("/")) {
+      const baseUrl = new URL(config.url).origin
+      fullUrl = baseUrl + url
+    } else if (!url.startsWith("http")) {
+      continue
+    }
+
+    articles.push({
+      title,
+      url: fullUrl,
+      publishedDate: new Date().toISOString(),
+      content: "",
+      rawHtml: "",
+    })
+
+    count++
+  }
+
+  return articles
+}
+
+async function filterArticleWithAI(article: any) {
+  const prompt = `
+Phân tích bài viết sau và xác định mức độ liên quan đến xuất nhập khẩu thực phẩm:
+
+Tiêu đề: ${article.title}
+URL: ${article.url}
+
+Quy tắc lọc 3 lớp:
+- Lớp 1 (BẮT BUỘC): Phải chứa ít nhất 1 từ khóa về thực phẩm, xuất khẩu, nhập khẩu, FDA, GACC, MFDS, chứng nhận, an toàn thực phẩm
+- Lớp 2 (NÊN CÓ): Nên có từ khóa về nông sản, thủy sản, chế biến, đóng gói, nhãn mác, Process Filing
+- Lớp 3 (LOẠI TRỪ): Không được là dược phẩm, thiết bị y tế, mỹ phẩm không liên quan thực phẩm
+
+Trả về JSON với:
+{
+  "isRelevant": boolean,
+  "relevanceScore": 0-100,
+  "filterLayer": "layer1" | "layer2" | "layer3",
+  "keywords": string[],
+  "category": string,
+  "summary": string (tiếng Việt, 2-3 câu)
+}
+`
+
+  try {
+    const { text } = await generateText({
+      model: "openai/gpt-4o-mini",
+      prompt,
+      temperature: 0.3,
+    })
+
+    // Parse JSON response
+    const jsonMatch = text.match(/\{[\s\S]*\}/)
+    if (jsonMatch) {
+      const result = JSON.parse(jsonMatch[0])
+      return result
+    }
+  } catch (error) {
+    console.error("[v0] AI filtering error:", error)
+  }
+
+  // Fallback to keyword matching
+  return fallbackKeywordFilter(article)
+}
+
+function fallbackKeywordFilter(article: any) {
+  const text = `${article.title} ${article.content}`.toLowerCase()
+
+  // Layer 1: Must have at least one keyword
+  const layer1Matches = FILTER_KEYWORDS.layer1_must.filter((kw) => text.includes(kw.toLowerCase()))
+
+  if (layer1Matches.length === 0) {
+    return {
+      isRelevant: false,
+      relevanceScore: 0,
+      filterLayer: "layer1",
+      keywords: [],
+      category: "Không liên quan",
+      summary: "Bài viết không chứa từ khóa bắt buộc về xuất nhập khẩu thực phẩm.",
+    }
+  }
+
+  // Layer 3: Must not contain exclude keywords
+  const layer3Matches = FILTER_KEYWORDS.layer3_exclude.filter((kw) => text.includes(kw.toLowerCase()))
+
+  if (layer3Matches.length > 0) {
+    return {
+      isRelevant: false,
+      relevanceScore: 20,
+      filterLayer: "layer3",
+      keywords: layer3Matches,
+      category: "Loại trừ",
+      summary: "Bài viết thuộc lĩnh vực loại trừ (dược phẩm, y tế).",
+    }
+  }
+
+  // Layer 2: Should have keywords for higher relevance
+  const layer2Matches = FILTER_KEYWORDS.layer2_should.filter((kw) => text.includes(kw.toLowerCase()))
+
+  const relevanceScore = Math.min(100, 50 + layer2Matches.length * 10)
+
+  return {
+    isRelevant: true,
+    relevanceScore,
+    filterLayer: layer2Matches.length > 0 ? "layer2" : "layer1",
+    keywords: [...layer1Matches, ...layer2Matches],
+    category: "Xuất nhập khẩu thực phẩm",
+    summary: `Bài viết liên quan đến ${layer1Matches.join(", ")}. Chứa ${layer1Matches.length + layer2Matches.length} từ khóa liên quan.`,
+  }
+}
+
+export async function getNewsArticles(filters?: {
+  source?: "FDA" | "GACC"
+  status?: string
+  minRelevance?: number
+  limit?: number
+}) {
+  const supabase = await getSupabaseServerClient()
+
+  let query = supabase.from("news_articles").select("*").order("published_date", { ascending: false })
+
+  if (filters?.source) {
+    query = query.eq("source", filters.source)
+  }
+
+  if (filters?.status) {
+    query = query.eq("status", filters.status)
+  }
+
+  if (filters?.minRelevance) {
+    query = query.gte("relevance_score", filters.minRelevance)
+  }
+
+  if (filters?.limit) {
+    query = query.limit(filters.limit)
+  }
+
+  const { data, error } = await query
+
+  if (error) {
+    console.error("[v0] Error fetching articles:", error)
+    throw error
+  }
+
+  return data
+}
+
+export async function updateArticleStatus(articleId: string, status: "approved" | "rejected" | "published") {
+  const supabase = await getSupabaseServerClient()
+
+  const { error } = await supabase
+    .from("news_articles")
+    .update({ status, updated_at: new Date().toISOString() })
+    .eq("id", articleId)
+
+  if (error) {
+    console.error("[v0] Error updating article status:", error)
+    throw error
+  }
+}

@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Calendar, User, ArrowRight } from "lucide-react"
 import Link from "next/link"
+import { BlogSearch } from "@/components/blog-search"
 
 export const metadata = {
   title: "Blog - Kiến thức xuất nhập khẩu | Vexim Global",
@@ -60,10 +61,14 @@ export default async function BlogPage({ searchParams }: { searchParams: Promise
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto text-center">
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-balance">Blog & Kiến thức</h1>
-              <p className="text-lg md:text-xl text-white/90 leading-relaxed">
+              <p className="text-lg md:text-xl text-white/90 leading-relaxed mb-8">
                 Cập nhật tin tức mới nhất về xuất nhập khẩu, quy định pháp lý quốc tế và các hướng dẫn chuyên sâu từ đội
                 ngũ chuyên gia Vexim Global
               </p>
+              {/* Search Bar in Hero Section */}
+              <div className="max-w-2xl mx-auto">
+                <BlogSearch />
+              </div>
             </div>
           </div>
         </section>
