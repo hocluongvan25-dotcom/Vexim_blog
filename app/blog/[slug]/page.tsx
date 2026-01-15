@@ -114,8 +114,8 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
       <main className="min-h-screen pt-20 md:pt-24">
         <article className="py-8 md:py-12">
           <div className="container mx-auto px-4 max-w-7xl">
-            <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-8 lg:gap-12">
-              <div className="w-full">
+            <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,_4fr)_minmax(250px,_1fr)] gap-8 xl:gap-12">
+              <div className="w-full max-w-5xl mx-auto xl:mx-0">
                 <Link href="/blog" className="hidden md:inline-block">
                   <Button variant="ghost" className="mb-8 -ml-4">
                     <ArrowLeft className="w-4 h-4 mr-2" />
@@ -175,7 +175,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                 <RelatedPosts currentPostId={post.id} category={post.category} />
               </div>
 
-              <div className="hidden lg:block">
+              <div className="hidden xl:block">
                 <BlogTableOfContents content={post.content} />
               </div>
             </div>
