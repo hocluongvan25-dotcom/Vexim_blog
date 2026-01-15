@@ -133,10 +133,16 @@ export async function crawlNews(source: "FDA" | "GACC") {
       throw new Error(`No config found for source: ${source}`)
     }
 
-    // Fetch the page content
     const response = await fetch(config.url, {
       headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; VeximGlobalBot/1.0)",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+        "Accept-Encoding": "gzip, deflate",
+        Connection: "keep-alive",
+        "Upgrade-Insecure-Requests": "1",
+        "Cache-Control": "max-age=0",
       },
     })
 
@@ -285,9 +291,12 @@ Trả về JSON với:
 }
 `
 
+  const useDirectOpenAI = !!process.env.OPENAI_API_KEY
+
   try {
     const { text } = await generateText({
-      model: "openai/gpt-4o-mini",
+      model: useDirectOpenAI ? "gpt-4o-mini" : "openai/gpt-4o-mini",
+      apiKey: useDirectOpenAI ? process.env.OPENAI_API_KEY : undefined,
       prompt,
       temperature: 0.3,
     })
@@ -300,6 +309,7 @@ Trả về JSON với:
     }
   } catch (error) {
     console.error("[v0] AI filtering error:", error)
+    console.log("[v0] Falling back to keyword-based filtering...")
   }
 
   // Fallback to keyword matching
