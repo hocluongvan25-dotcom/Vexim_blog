@@ -136,10 +136,11 @@ export function RichTextEditor({ value, onChange, placeholder }: RichTextEditorP
         ref={editorRef}
         contentEditable
         onInput={handleInput}
-        className="min-h-[400px] p-4 focus:outline-none prose prose-slate max-w-none"
+        className="min-h-[400px] p-4 focus:outline-none w-full"
         style={{
           // Custom styles for the editor
           lineHeight: "1.6",
+          maxWidth: "100%",
         }}
         suppressContentEditableWarning
         data-placeholder={placeholder}

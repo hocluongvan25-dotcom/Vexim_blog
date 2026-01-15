@@ -173,7 +173,8 @@ html {
 /* Rich Text Editor Styles */
 .prose {
   color: var(--color-foreground);
-  max-width: 65ch;
+  /* Removed max-width: 65ch constraint to allow full width content */
+  max-width: 100%;
 }
 
 .prose h2 {
