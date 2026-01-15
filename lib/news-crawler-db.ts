@@ -1,492 +1,431 @@
-import { getSupabaseServerClient } from "./supabase-server"
 import { generateText } from "ai"
 import { openai } from "@ai-sdk/openai"
+import { createClient } from "@/lib/supabase-server"
 
-interface CrawlConfig {
-  source: "FDA" | "GACC"
-  url: string
-  selectors: {
-    container: string
-    title: string
-    link: string
-    date?: string
-    content?: string
-  }
-}
-
-interface FilterKeywords {
-  layer1_must: string[]
-  layer2_should: string[]
-  layer3_exclude: string[]
-}
-
-const FILTER_KEYWORDS: FilterKeywords = {
-  layer1_must: [
-    "thực phẩm",
-    "food",
-    "xuất khẩu",
-    "export",
-    "nhập khẩu",
-    "import",
-    "chứng nhận",
-    "certification",
-    "giấy phép",
-    "license",
-    "FDA",
-    "GACC",
-    "MFDS",
-    "an toàn thực phẩm",
-    "food safety",
-    "quy định",
-    "regulation",
-    "tiêu chuẩn",
-    "standard",
-    "kiểm tra",
-    "inspection",
-    "hải quan",
-    "customs",
-  ],
-  layer2_should: [
-    "nông sản",
-    "agricultural",
-    "thủy sản",
-    "seafood",
-    "chế biến",
-    "processed",
-    "đóng gói",
-    "packaging",
-    "nhãn mác",
-    "labeling",
-    "Process Filing",
-    "US Agent",
-    "Prior Notice",
-    "FSVP",
-    "进口",
-    "出口",
-    "食品",
-    "农产品",
-    "水产品",
-    "认证",
-    "检验检疫",
-    "备案",
-  ],
-  layer3_exclude: [
-    "dược phẩm",
-    "pharmaceutical",
-    "thiết bị y tế",
-    "medical device",
-    "mỹ phẩm không liên quan thực phẩm",
-    "cosmetics unrelated to food",
-    "thú y không liên quan xuất nhập",
-    "veterinary unrelated to export",
-    "药品",
-    "医疗器械",
-    "化妆品",
-  ],
-}
-
-const CRAWL_CONFIGS: CrawlConfig[] = [
-  {
-    source: "FDA",
-    url: "https://www.fda.gov/news-events/fda-newsroom/press-announcements",
-    selectors: {
-      container: ".views-row",
-      title: ".views-field-title a",
-      link: ".views-field-title a",
-      date: ".views-field-field-release-date",
-    },
-  },
-  {
-    source: "GACC",
-    url: "http://www.customs.gov.cn/customs/302249/2480148/index.html",
-    selectors: {
-      container: ".news-list li",
-      title: "a",
-      link: "a",
-      date: ".date",
-    },
-  },
+// Tier 1: Keyword filtering
+const TIER1_KEYWORDS = [
+  "food",
+  "thực phẩm",
+  "import",
+  "export",
+  "xuất khẩu",
+  "nhập khẩu",
+  "FDA",
+  "GACC",
+  "MFDS",
+  "regulation",
+  "quy định",
+  "seafood",
+  "hải sản",
+  "agricultural",
+  "nông sản",
+  "beverage",
+  "đồ uống",
+  "inspection",
+  "kiểm tra",
+  "certificate",
+  "giấy chứng nhận",
+  "registration",
+  "đăng ký",
+  "compliance",
+  "tuân thủ",
 ]
 
-export async function crawlNews(source: "FDA" | "GACC") {
-  const supabase = await getSupabaseServerClient()
+interface ArticleLink {
+  title: string
+  url: string
+  date?: string
+}
 
-  // Create crawl log
-  const { data: logData, error: logError } = await supabase
-    .from("crawl_logs")
-    .insert({
-      source,
-      status: "running",
-    })
-    .select()
-    .single()
-
-  if (logError) {
-    console.error("[v0] Error creating crawl log:", logError)
-    throw new Error("Failed to create crawl log")
-  }
-
-  const logId = logData.id
+// Fetch FDA news using RSS feed (more reliable than HTML parsing)
+async function fetchFDAArticles(): Promise<ArticleLink[]> {
+  console.log("[v0] Trying FDA crawl strategy 1/1...")
 
   try {
-    const config = CRAWL_CONFIGS.find((c) => c.source === source)
-    if (!config) {
-      throw new Error(`No config found for source: ${source}`)
+    // FDA RSS feed is more reliable than parsing HTML
+    const response = await fetch(
+      "https://www.fda.gov/about-fda/contact-fda/stay-informed/rss-feeds/press-releases/rss.xml",
+      {
+        headers: {
+          "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+          Accept: "application/rss+xml, application/xml, text/xml",
+        },
+      },
+    )
+
+    if (!response.ok) {
+      throw new Error(`${response.status} ${response.statusText}`)
     }
 
-    let response
-    let lastError
+    const xml = await response.text()
+    console.log(`[v0] FDA crawl successful with strategy 1`)
+    console.log(`[v0] Fetched ${xml.length} bytes from FDA`)
 
-    // Try multiple strategies for GACC
-    const strategies =
-      source === "GACC"
-        ? [
-            // Strategy 1: Full browser simulation
-            {
-              headers: {
-                "User-Agent":
-                  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-                Accept:
-                  "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
-                "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
-                "Accept-Encoding": "gzip, deflate",
-                Connection: "keep-alive",
-                "Upgrade-Insecure-Requests": "1",
-                "Cache-Control": "max-age=0",
-                Referer: "http://www.customs.gov.cn/",
-                Host: "www.customs.gov.cn",
-              },
-            },
-            // Strategy 2: Simplified headers
-            {
-              headers: {
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-                Accept: "text/html",
-                "Accept-Language": "zh-CN",
-              },
-            },
-            // Strategy 3: Minimal headers
-            {
-              headers: {
-                "User-Agent": "Mozilla/5.0",
-              },
-            },
-          ]
-        : [
-            // FDA - simple strategy
-            {
-              headers: {
-                "User-Agent":
-                  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-              },
-            },
-          ]
+    // Parse XML RSS feed
+    const articles: ArticleLink[] = []
+    const itemRegex = /<item>([\s\S]*?)<\/item>/g
+    const titleRegex = /<title><!\[CDATA\[(.*?)\]\]><\/title>/
+    const linkRegex = /<link>(.*?)<\/link>/
+    const pubDateRegex = /<pubDate>(.*?)<\/pubDate>/
 
-    for (let i = 0; i < strategies.length; i++) {
-      try {
-        console.log(`[v0] Trying ${source} crawl strategy ${i + 1}/${strategies.length}...`)
+    let match
+    while ((match = itemRegex.exec(xml)) !== null) {
+      const itemContent = match[1]
+      const titleMatch = titleRegex.exec(itemContent)
+      const linkMatch = linkRegex.exec(itemContent)
+      const dateMatch = pubDateRegex.exec(itemContent)
 
-        response = await fetch(config.url, {
-          ...strategies[i],
-          redirect: "follow",
+      if (titleMatch && linkMatch) {
+        articles.push({
+          title: titleMatch[1].trim(),
+          url: linkMatch[1].trim(),
+          date: dateMatch ? dateMatch[1].trim() : undefined,
         })
+      }
+    }
 
-        if (response.ok) {
-          console.log(`[v0] ${source} crawl successful with strategy ${i + 1}`)
-          break
-        } else {
-          lastError = `Strategy ${i + 1} failed: ${response.status} ${response.statusText}`
-          console.log(`[v0] ${lastError}`)
+    console.log(`[v0] Parsed ${articles.length} article links from RSS feed`)
+    return articles.slice(0, 20) // Get latest 20 articles
+  } catch (error: any) {
+    console.error(`[v0] FDA crawl failed:`, error.message)
+    return []
+  }
+}
+
+// Fetch GACC news using their RSS or alternative method
+async function fetchGACCArticles(): Promise<ArticleLink[]> {
+  const strategies = [
+    // Strategy 1: Try their news API endpoint
+    async () => {
+      console.log("[v0] Trying GACC crawl strategy 1/2...")
+      const response = await fetch("http://www.customs.gov.cn/customs/302249/302266/302267/index.html", {
+        headers: {
+          "User-Agent":
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+          "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+          "Accept-Encoding": "gzip, deflate",
+          Connection: "keep-alive",
+          "Upgrade-Insecure-Requests": "1",
+        },
+      })
+
+      if (!response.ok) throw new Error(`${response.status} ${response.statusText}`)
+
+      const html = await response.text()
+      console.log(`[v0] Strategy 1 successful, fetched ${html.length} bytes`)
+
+      // Parse HTML for article links
+      const articles: ArticleLink[] = []
+      const linkRegex = /<a\s+href=["'](\/customs\/[^"']+)["'][^>]*>([^<]+)<\/a>/g
+      const dateRegex = /(\d{4})-(\d{2})-(\d{2})/
+
+      let match
+      while ((match = linkRegex.exec(html)) !== null && articles.length < 20) {
+        const url = match[1]
+        const title = match[2].trim()
+        const dateMatch = dateRegex.exec(html.substring(match.index - 50, match.index + 200))
+
+        if (title.length > 10) {
+          // Filter out navigation links
+          articles.push({
+            title,
+            url: `http://www.customs.gov.cn${url}`,
+            date: dateMatch ? `${dateMatch[1]}-${dateMatch[2]}-${dateMatch[3]}` : undefined,
+          })
         }
-      } catch (error: any) {
-        lastError = `Strategy ${i + 1} error: ${error.message}`
-        console.log(`[v0] ${lastError}`)
       }
 
-      // Wait between retries
+      return articles
+    },
+
+    // Strategy 2: Fallback to mock data with a note to manually update
+    async () => {
+      console.log("[v0] Trying GACC crawl strategy 2/2 (fallback)...")
+      console.log("[v0] GACC website is blocking automated access. Using fallback mode.")
+      console.log("[v0] Note: Please manually add GACC articles or contact their webmaster for API access.")
+
+      // Return empty array - user can manually add GACC news
+      return []
+    },
+  ]
+
+  for (let i = 0; i < strategies.length; i++) {
+    try {
+      const articles = await strategies[i]()
+      if (articles.length > 0) {
+        console.log(`[v0] Found ${articles.length} article links from GACC`)
+        return articles
+      }
+    } catch (error: any) {
+      console.log(`[v0] Strategy ${i + 1} failed: ${error.message}`)
       if (i < strategies.length - 1) {
         await new Promise((resolve) => setTimeout(resolve, 2000))
       }
     }
+  }
 
-    if (!response || !response.ok) {
-      throw new Error(`All strategies failed for ${source}. Last error: ${lastError}`)
-    }
+  console.log(`[v0] All GACC strategies failed, returning empty array`)
+  return []
+}
+
+// Fetch full article content
+async function fetchArticleDetail(url: string, source: string): Promise<string | null> {
+  try {
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      },
+    })
+
+    if (!response.ok) return null
 
     const html = await response.text()
-    console.log(`[v0] Fetched ${html.length} bytes from ${source}`)
 
-    // Parse HTML (simple regex-based parsing for demo)
-    const articles = await parseHTML(html, config)
+    // Extract main content based on source
+    let content = ""
+    if (source === "FDA") {
+      // FDA uses specific content containers
+      const contentMatch = html.match(/<div class="content-body">([\s\S]*?)<\/div>/i)
+      content = contentMatch ? contentMatch[1] : html
+    } else {
+      // GACC - try common content containers
+      const contentMatch =
+        html.match(/<div class="content">([\s\S]*?)<\/div>/i) || html.match(/<div id="content">([\s\S]*?)<\/div>/i)
+      content = contentMatch ? contentMatch[1] : html
+    }
 
-    console.log(`[v0] Found ${articles.length} articles from ${source}`)
+    // Strip HTML tags and clean up
+    content = content
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
 
-    let articlesFiltered = 0
+    return content.substring(0, 3000) // Limit to 3000 chars
+  } catch (error) {
+    console.error(`[v0] Error fetching article detail from ${url}:`, error)
+    return null
+  }
+}
 
-    // Process each article
+// Tier 1: Keyword filter
+function tier1KeywordFilter(text: string): boolean {
+  const lowerText = text.toLowerCase()
+  return TIER1_KEYWORDS.some((keyword) => lowerText.includes(keyword.toLowerCase()))
+}
+
+// Tier 2 & 3: AI analysis with OpenAI
+async function aiAnalysis(
+  title: string,
+  content: string,
+  source: string,
+): Promise<{
+  passed: boolean
+  relevance: "high" | "medium" | "low"
+  category: string
+  excerpt: string
+} | null> {
+  try {
+    const hasApiKey = !!process.env.OPENAI_API_KEY
+
+    if (!hasApiKey) {
+      console.log("[v0] No OPENAI_API_KEY found, falling back to keyword-only filtering")
+      // Fallback: simple keyword matching
+      const passed = tier1KeywordFilter(title + " " + content)
+      return passed
+        ? {
+            passed: true,
+            relevance: "medium",
+            category: source === "FDA" ? "FDA Regulations" : "GACC Updates",
+            excerpt: content.substring(0, 200),
+          }
+        : null
+    }
+
+    console.log("[v0] Using OpenAI API for AI filtering...")
+
+    const prompt = `Phân tích bài viết tin tức về xuất nhập khẩu thực phẩm:
+
+TIÊU ĐỀ: ${title}
+NỘI DUNG: ${content}
+NGUỒN: ${source}
+
+YÊU CẦU ĐÁNH GIÁ:
+1. Có liên quan trực tiếp đến xuất/nhập khẩu thực phẩm (hải sản, nông sản, đồ uống) sang Mỹ, Trung Quốc, Hàn Quốc?
+2. Có đề cập quy định FDA, GACC, MFDS hay các giấy tờ pháp lý (Process Filing, GACC Registration, US Agent)?
+3. Có cập nhật chính sách mới ảnh hưởng đến doanh nghiệp xuất khẩu thực phẩm?
+
+Trả về JSON format:
+{
+  "passed": true/false (true nếu liên quan đến xuất nhập khẩu thực phẩm),
+  "relevance": "high/medium/low",
+  "category": "FDA Regulations" hoặc "GACC Updates" hoặc "Export Requirements" hoặc "Food Safety",
+  "excerpt": "tóm tắt ngắn gọn 1-2 câu về nội dung chính"
+}
+
+CHỈ trả về JSON, không giải thích thêm.`
+
+    const { text } = await generateText({
+      model: openai("gpt-4o-mini"),
+      prompt,
+      maxTokens: 300,
+    })
+
+    // Parse JSON response
+    const jsonMatch = text.match(/\{[\s\S]*\}/)
+    if (!jsonMatch) {
+      console.error("[v0] Could not parse AI response as JSON")
+      return null
+    }
+
+    const result = JSON.parse(jsonMatch[0])
+    return result.passed ? result : null
+  } catch (error: any) {
+    console.error("[v0] AI analysis error:", error.message)
+    // Fallback to keyword filtering
+    const passed = tier1KeywordFilter(title + " " + content)
+    return passed
+      ? {
+          passed: true,
+          relevance: "medium",
+          category: source === "FDA" ? "FDA Regulations" : "GACC Updates",
+          excerpt: content.substring(0, 200),
+        }
+      : null
+  }
+}
+
+// Main crawl function
+export async function crawlNews(source: "FDA" | "GACC") {
+  const supabase = await createClient()
+
+  try {
+    // Fetch article links
+    const articles = source === "FDA" ? await fetchFDAArticles() : await fetchGACCArticles()
+
+    if (articles.length === 0) {
+      return {
+        success: false,
+        message: `No articles found from ${source}`,
+        savedCount: 0,
+      }
+    }
+
+    console.log(`[v0] Processing ${articles.length} articles from ${source}...`)
+
+    let savedCount = 0
+    let processedCount = 0
+
     for (const article of articles) {
-      // Check if article already exists
-      const { data: existing } = await supabase.from("news_articles").select("id").eq("url", article.url).single()
+      processedCount++
+      console.log(`[v0] [${processedCount}/${articles.length}] Processing: ${article.title}`)
 
-      if (existing) {
-        console.log(`[v0] Article already exists: ${article.title}`)
+      // Tier 1: Keyword filter
+      if (!tier1KeywordFilter(article.title)) {
+        console.log(`[v0] [Tier 1] Filtered out (no keywords): ${article.title}`)
         continue
       }
 
-      // Apply AI filtering
-      const filterResult = await filterArticleWithAI(article)
+      // Fetch full article content
+      console.log(`[v0] Fetching article detail from: ${article.url}`)
+      const content = await fetchArticleDetail(article.url, source)
 
-      if (filterResult.isRelevant) {
-        // Insert article into database
-        const { error: insertError } = await supabase.from("news_articles").insert({
-          source,
-          title: article.title,
-          url: article.url,
-          published_date: article.publishedDate,
-          content: article.content,
-          summary: filterResult.summary,
-          category: filterResult.category,
-          relevance_score: filterResult.relevanceScore,
-          filter_layer: filterResult.filterLayer,
-          keywords: filterResult.keywords,
-          status: "pending",
-          raw_html: article.rawHtml,
-        })
-
-        if (insertError) {
-          console.error("[v0] Error inserting article:", insertError)
-        } else {
-          articlesFiltered++
-          console.log(`[v0] Added article: ${article.title}`)
-        }
+      if (!content) {
+        console.log(`[v0] Could not fetch article content, skipping`)
+        continue
       }
-    }
 
-    // Update crawl log
-    await supabase
-      .from("crawl_logs")
-      .update({
-        completed_at: new Date().toISOString(),
-        status: "completed",
-        articles_found: articles.length,
-        articles_filtered: articlesFiltered,
+      console.log(`[v0] Fetched ${content.length} chars of content`)
+
+      // Tier 2 & 3: AI analysis
+      const aiResult = await aiAnalysis(article.title, content, source)
+
+      if (!aiResult) {
+        console.log(`[v0] [AI Filter] Not relevant: ${article.title}`)
+        continue
+      }
+
+      console.log(`[v0] [AI Filter] PASSED - Relevance: ${aiResult.relevance}, Category: ${aiResult.category}`)
+
+      // Save to database
+      const { error } = await supabase.from("news_articles").insert({
+        title: article.title,
+        url: article.url,
+        source,
+        content: content.substring(0, 5000),
+        excerpt: aiResult.excerpt,
+        category: aiResult.category,
+        relevance_score: aiResult.relevance === "high" ? 90 : aiResult.relevance === "medium" ? 60 : 30,
+        status: "pending",
+        published_date: article.date || new Date().toISOString(),
       })
-      .eq("id", logId)
+
+      if (error) {
+        console.error(`[v0] Database error:`, error)
+      } else {
+        savedCount++
+        console.log(`[v0] ✓ Saved to database: ${article.title}`)
+      }
+
+      // Delay to avoid rate limiting
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+    }
 
     return {
       success: true,
-      articlesFound: articles.length,
-      articlesFiltered,
+      message: `Processed ${processedCount} articles, saved ${savedCount} relevant articles`,
+      processedCount,
+      savedCount,
     }
   } catch (error: any) {
-    // Update crawl log with error
-    await supabase
-      .from("crawl_logs")
-      .update({
-        completed_at: new Date().toISOString(),
-        status: "failed",
-        error_message: error.message,
-      })
-      .eq("id", logId)
-
+    console.error(`[v0] Crawl error for ${source}:`, error)
     throw error
   }
 }
 
-async function parseHTML(html: string, config: CrawlConfig) {
-  // This is a simplified parser. In production, use a proper HTML parser like cheerio
-  const articles: any[] = []
-
-  // Extract links using regex (simplified)
-  const linkRegex = /<a[^>]*href=["']([^"']+)["'][^>]*>([^<]+)<\/a>/gi
-  let match
-  let count = 0
-
-  while ((match = linkRegex.exec(html)) !== null && count < 20) {
-    const url = match[1]
-    const title = match[2].trim()
-
-    // Skip empty or invalid URLs
-    if (!url || !title || title.length < 10) continue
-
-    // Make URL absolute
-    let fullUrl = url
-    if (url.startsWith("/")) {
-      const baseUrl = new URL(config.url).origin
-      fullUrl = baseUrl + url
-    } else if (!url.startsWith("http")) {
-      continue
-    }
-
-    articles.push({
-      title,
-      url: fullUrl,
-      publishedDate: new Date().toISOString(),
-      content: "",
-      rawHtml: "",
-    })
-
-    count++
-  }
-
-  return articles
-}
-
-async function filterArticleWithAI(article: any) {
-  const prompt = `
-Phân tích bài viết sau và xác định mức độ liên quan đến xuất nhập khẩu thực phẩm:
-
-Tiêu đề: ${article.title}
-URL: ${article.url}
-
-Quy tắc lọc 3 lớp:
-- Lớp 1 (BẮT BUỘC): Phải chứa ít nhất 1 từ khóa về thực phẩm, xuất khẩu, nhập khẩu, FDA, GACC, MFDS, chứng nhận, an toàn thực phẩm
-- Lớp 2 (NÊN CÓ): Nên có từ khóa về nông sản, thủy sản, chế biến, đóng gói, nhãn mác, Process Filing
-- Lớp 3 (LOẠI TRỪ): Không được là dược phẩm, thiết bị y tế, mỹ phẩm không liên quan thực phẩm
-
-Trả về JSON với:
-{
-  "isRelevant": boolean,
-  "relevanceScore": 0-100,
-  "filterLayer": "layer1" | "layer2" | "layer3",
-  "keywords": string[],
-  "category": string,
-  "summary": string (tiếng Việt, 2-3 câu)
-}
-`
-
-  const hasOpenAIKey = !!process.env.OPENAI_API_KEY
-
-  try {
-    let result
-
-    if (hasOpenAIKey) {
-      // Use OpenAI directly with API key
-      console.log("[v0] Using OpenAI API with direct key...")
-      const { text } = await generateText({
-        model: openai("gpt-4o-mini"),
-        prompt,
-        temperature: 0.3,
-      })
-      result = text
-    } else {
-      // Try AI Gateway (requires credit card)
-      console.log("[v0] Using Vercel AI Gateway...")
-      const { text } = await generateText({
-        model: "openai/gpt-4o-mini",
-        prompt,
-        temperature: 0.3,
-      })
-      result = text
-    }
-
-    // Parse JSON response
-    const jsonMatch = result.match(/\{[\s\S]*\}/)
-    if (jsonMatch) {
-      const parsedResult = JSON.parse(jsonMatch[0])
-      return parsedResult
-    }
-  } catch (error) {
-    console.error("[v0] AI filtering error:", error)
-    console.log("[v0] Falling back to keyword-based filtering...")
-  }
-
-  // Fallback to keyword matching
-  return fallbackKeywordFilter(article)
-}
-
-function fallbackKeywordFilter(article: any) {
-  const text = `${article.title} ${article.content}`.toLowerCase()
-
-  // Layer 1: Must have at least one keyword
-  const layer1Matches = FILTER_KEYWORDS.layer1_must.filter((kw) => text.includes(kw.toLowerCase()))
-
-  if (layer1Matches.length === 0) {
-    return {
-      isRelevant: false,
-      relevanceScore: 0,
-      filterLayer: "layer1",
-      keywords: [],
-      category: "Không liên quan",
-      summary: "Bài viết không chứa từ khóa bắt buộc về xuất nhập khẩu thực phẩm.",
-    }
-  }
-
-  // Layer 3: Must not contain exclude keywords
-  const layer3Matches = FILTER_KEYWORDS.layer3_exclude.filter((kw) => text.includes(kw.toLowerCase()))
-
-  if (layer3Matches.length > 0) {
-    return {
-      isRelevant: false,
-      relevanceScore: 20,
-      filterLayer: "layer3",
-      keywords: layer3Matches,
-      category: "Loại trừ",
-      summary: "Bài viết thuộc lĩnh vực loại trừ (dược phẩm, y tế).",
-    }
-  }
-
-  // Layer 2: Should have keywords for higher relevance
-  const layer2Matches = FILTER_KEYWORDS.layer2_should.filter((kw) => text.includes(kw.toLowerCase()))
-
-  const relevanceScore = Math.min(100, 50 + layer2Matches.length * 10)
-
-  return {
-    isRelevant: true,
-    relevanceScore,
-    filterLayer: layer2Matches.length > 0 ? "layer2" : "layer1",
-    keywords: [...layer1Matches, ...layer2Matches],
-    category: "Xuất nhập khẩu thực phẩm",
-    summary: `Bài viết liên quan đến ${layer1Matches.join(", ")}. Chứa ${layer1Matches.length + layer2Matches.length} từ khóa liên quan.`,
-  }
-}
-
-export async function getNewsArticles(filters?: {
-  source?: "FDA" | "GACC"
+export async function getNewsArticles(options?: {
   status?: string
-  minRelevance?: number
   limit?: number
-}) {
-  const supabase = await getSupabaseServerClient()
+  offset?: number
+}): Promise<any[]> {
+  const supabase = await createClient()
 
-  let query = supabase.from("news_articles").select("*").order("published_date", { ascending: false })
+  let query = supabase.from("news_articles").select("*").order("created_at", { ascending: false })
 
-  if (filters?.source) {
-    query = query.eq("source", filters.source)
+  if (options?.status) {
+    query = query.eq("status", options.status)
   }
 
-  if (filters?.status) {
-    query = query.eq("status", filters.status)
+  if (options?.limit) {
+    query = query.limit(options.limit)
   }
 
-  if (filters?.minRelevance) {
-    query = query.gte("relevance_score", filters.minRelevance)
-  }
-
-  if (filters?.limit) {
-    query = query.limit(filters.limit)
+  if (options?.offset) {
+    query = query.range(options.offset, options.offset + (options.limit || 10) - 1)
   }
 
   const { data, error } = await query
 
   if (error) {
-    console.error("[v0] Error fetching articles:", error)
-    throw error
+    console.error("[v0] Error fetching news articles:", error)
+    return []
   }
 
-  return data
+  return data || []
 }
 
-export async function updateArticleStatus(articleId: string, status: "approved" | "rejected" | "published") {
-  const supabase = await getSupabaseServerClient()
+export async function updateArticleStatus(
+  id: string,
+  status: "pending" | "approved" | "rejected" | "published",
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = await createClient()
 
-  const { error } = await supabase
-    .from("news_articles")
-    .update({ status, updated_at: new Date().toISOString() })
-    .eq("id", articleId)
+  const { error } = await supabase.from("news_articles").update({ status }).eq("id", id)
 
   if (error) {
     console.error("[v0] Error updating article status:", error)
-    throw error
+    return { success: false, error: error.message }
   }
+
+  return { success: true }
 }
