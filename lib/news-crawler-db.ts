@@ -1,5 +1,6 @@
 import { getSupabaseServerClient } from "./supabase-server"
 import { generateText } from "ai"
+import { openai } from "@ai-sdk/openai"
 
 interface CrawlConfig {
   source: "FDA" | "GACC"
@@ -291,21 +292,36 @@ Trả về JSON với:
 }
 `
 
-  const useDirectOpenAI = !!process.env.OPENAI_API_KEY
+  const hasOpenAIKey = !!process.env.OPENAI_API_KEY
 
   try {
-    const { text } = await generateText({
-      model: useDirectOpenAI ? "gpt-4o-mini" : "openai/gpt-4o-mini",
-      apiKey: useDirectOpenAI ? process.env.OPENAI_API_KEY : undefined,
-      prompt,
-      temperature: 0.3,
-    })
+    let result
+
+    if (hasOpenAIKey) {
+      // Use OpenAI directly with API key
+      console.log("[v0] Using OpenAI API with direct key...")
+      const { text } = await generateText({
+        model: openai("gpt-4o-mini"),
+        prompt,
+        temperature: 0.3,
+      })
+      result = text
+    } else {
+      // Try AI Gateway (requires credit card)
+      console.log("[v0] Using Vercel AI Gateway...")
+      const { text } = await generateText({
+        model: "openai/gpt-4o-mini",
+        prompt,
+        temperature: 0.3,
+      })
+      result = text
+    }
 
     // Parse JSON response
-    const jsonMatch = text.match(/\{[\s\S]*\}/)
+    const jsonMatch = result.match(/\{[\s\S]*\}/)
     if (jsonMatch) {
-      const result = JSON.parse(jsonMatch[0])
-      return result
+      const parsedResult = JSON.parse(jsonMatch[0])
+      return parsedResult
     }
   } catch (error) {
     console.error("[v0] AI filtering error:", error)
