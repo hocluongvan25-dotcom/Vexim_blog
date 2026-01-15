@@ -210,20 +210,19 @@ export async function crawlNews(source: "FDA" | "GACC") {
     }
 
     if (!response || !response.ok) {
-      throw new Error(`All strategies failed for ${source}. Last error: ${lastError}`)
+      throw new Error(`Failed to fetch ${source}: ${lastError}`)
     }
 
     const html = await response.text()
     console.log(`[v0] Fetched ${html.length} bytes from ${source}`)
 
-    // Parse HTML (simple regex-based parsing for demo)
+    // Parse listing page to get article links
     const articles = await parseHTML(html, config)
 
-    console.log(`[v0] Found ${articles.length} articles from ${source}`)
+    console.log(`[v0] Found ${articles.length} article links from ${source}`)
 
     let articlesFiltered = 0
 
-    // Process each article
     for (const article of articles) {
       // Check if article already exists
       const { data: existing } = await supabase.from("news_articles").select("id").eq("url", article.url).single()
@@ -233,32 +232,40 @@ export async function crawlNews(source: "FDA" | "GACC") {
         continue
       }
 
-      // Apply AI filtering
-      const filterResult = await filterArticleWithAI(article)
+      // Fetch full article content
+      const fullArticle = await fetchArticleDetail(article, source)
+
+      // Add delay to avoid rate limiting
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
+      // Apply AI filtering with full content
+      const filterResult = await filterArticleWithAI(fullArticle)
 
       if (filterResult.isRelevant) {
         // Insert article into database
         const { error: insertError } = await supabase.from("news_articles").insert({
           source,
-          title: article.title,
-          url: article.url,
-          published_date: article.publishedDate,
-          content: article.content,
+          title: fullArticle.title,
+          url: fullArticle.url,
+          published_date: fullArticle.publishedDate,
+          content: fullArticle.content,
           summary: filterResult.summary,
           category: filterResult.category,
           relevance_score: filterResult.relevanceScore,
           filter_layer: filterResult.filterLayer,
           keywords: filterResult.keywords,
           status: "pending",
-          raw_html: article.rawHtml,
+          raw_html: fullArticle.rawHtml,
         })
 
         if (insertError) {
           console.error("[v0] Error inserting article:", insertError)
         } else {
           articlesFiltered++
-          console.log(`[v0] Added article: ${article.title}`)
+          console.log(`[v0] Added article: ${fullArticle.title} (${fullArticle.publishedDate})`)
         }
+      } else {
+        console.log(`[v0] Article filtered out: ${fullArticle.title} (Score: ${filterResult.relevanceScore})`)
       }
     }
 
@@ -294,42 +301,164 @@ export async function crawlNews(source: "FDA" | "GACC") {
 }
 
 async function parseHTML(html: string, config: CrawlConfig) {
-  // This is a simplified parser. In production, use a proper HTML parser like cheerio
   const articles: any[] = []
 
-  // Extract links using regex (simplified)
-  const linkRegex = /<a[^>]*href=["']([^"']+)["'][^>]*>([^<]+)<\/a>/gi
-  let match
-  let count = 0
+  try {
+    if (config.source === "FDA") {
+      // FDA structure: <div class="views-row"><h3><a href="/news...">Title</a></h3><time>Date</time></div>
+      const rowRegex = /<div[^>]*class="[^"]*views-row[^"]*"[^>]*>([\s\S]*?)<\/div>/gi
+      let rowMatch
 
-  while ((match = linkRegex.exec(html)) !== null && count < 20) {
-    const url = match[1]
-    const title = match[2].trim()
+      while ((rowMatch = rowRegex.exec(html)) !== null && articles.length < 20) {
+        const rowHtml = rowMatch[1]
 
-    // Skip empty or invalid URLs
-    if (!url || !title || title.length < 10) continue
+        // Extract link and title
+        const linkMatch = /<a[^>]*href=["']([^"']+)["'][^>]*>([^<]+)<\/a>/i.exec(rowHtml)
+        if (!linkMatch) continue
 
-    // Make URL absolute
-    let fullUrl = url
-    if (url.startsWith("/")) {
-      const baseUrl = new URL(config.url).origin
-      fullUrl = baseUrl + url
-    } else if (!url.startsWith("http")) {
-      continue
+        let url = linkMatch[1]
+        const title = linkMatch[2].trim()
+
+        // Make URL absolute
+        if (url.startsWith("/")) {
+          url = "https://www.fda.gov" + url
+        }
+
+        // Extract date
+        const dateMatch =
+          /<time[^>]*datetime=["']([^"']+)["'][^>]*>/i.exec(rowHtml) ||
+          /<div[^>]*class="[^"]*views-field-field-release-date[^"]*"[^>]*>([^<]+)<\/div>/i.exec(rowHtml)
+        const publishedDate = dateMatch ? dateMatch[1].trim() : null
+
+        articles.push({
+          title,
+          url,
+          publishedDate: publishedDate || new Date().toISOString(),
+          needsDetailFetch: true,
+        })
+      }
+    } else if (config.source === "GACC") {
+      // GACC structure: <li><span class="date">2024-01-15</span><a href="/path">Title</a></li>
+      const itemRegex = /<li[^>]*>([\s\S]*?)<\/li>/gi
+      let itemMatch
+
+      while ((itemMatch = itemRegex.exec(html)) !== null && articles.length < 20) {
+        const itemHtml = itemMatch[1]
+
+        // Extract link and title
+        const linkMatch = /<a[^>]*href=["']([^"']+)["'][^>]*>([^<]+)<\/a>/i.exec(itemHtml)
+        if (!linkMatch) continue
+
+        let url = linkMatch[1]
+        const title = linkMatch[2].trim()
+
+        // Make URL absolute
+        if (url.startsWith("/")) {
+          url = "http://www.customs.gov.cn" + url
+        } else if (!url.startsWith("http")) {
+          continue
+        }
+
+        // Extract date
+        const dateMatch =
+          /<span[^>]*class="[^"]*date[^"]*"[^>]*>([^<]+)<\/span>/i.exec(itemHtml) ||
+          /(\d{4}[-/]\d{2}[-/]\d{2})/i.exec(itemHtml)
+        const publishedDate = dateMatch ? dateMatch[1].trim() : null
+
+        articles.push({
+          title,
+          url,
+          publishedDate: publishedDate || new Date().toISOString(),
+          needsDetailFetch: true,
+        })
+      }
     }
 
-    articles.push({
-      title,
-      url: fullUrl,
-      publishedDate: new Date().toISOString(),
-      content: "",
-      rawHtml: "",
-    })
-
-    count++
+    console.log(`[v0] Parsed ${articles.length} article links from listing page`)
+  } catch (error) {
+    console.error("[v0] Error parsing HTML:", error)
   }
 
   return articles
+}
+
+async function fetchArticleDetail(article: any, source: "FDA" | "GACC") {
+  try {
+    console.log(`[v0] Fetching article detail: ${article.url}`)
+
+    const headers =
+      source === "GACC"
+        ? {
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+            "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
+            Referer: "http://www.customs.gov.cn/",
+          }
+        : {
+            "User-Agent":
+              "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+          }
+
+    const response = await fetch(article.url, { headers })
+
+    if (!response.ok) {
+      console.error(`[v0] Failed to fetch article: ${response.status}`)
+      return article
+    }
+
+    const html = await response.text()
+
+    // Extract main content based on source
+    let content = ""
+    const rawHtml = html.substring(0, 5000) // Store first 5000 chars for reference
+
+    if (source === "FDA") {
+      // Extract content from FDA article page
+      const contentMatch = /<div[^>]*class="[^"]*article-content[^"]*"[^>]*>([\s\S]*?)<\/div>/i.exec(html)
+      if (contentMatch) {
+        content = contentMatch[1]
+          .replace(/<[^>]+>/g, " ")
+          .replace(/\s+/g, " ")
+          .trim()
+          .substring(0, 2000)
+      }
+
+      // Try to get more accurate date
+      const dateMatch = /<time[^>]*datetime=["']([^"']+)["'][^>]*>/i.exec(html)
+      if (dateMatch) {
+        article.publishedDate = dateMatch[1]
+      }
+    } else if (source === "GACC") {
+      // Extract content from GACC article page
+      const contentMatch =
+        /<div[^>]*class="[^"]*content[^"]*"[^>]*>([\s\S]*?)<\/div>/i.exec(html) ||
+        /<div[^>]*id="[^"]*content[^"]*"[^>]*>([\s\S]*?)<\/div>/i.exec(html)
+
+      if (contentMatch) {
+        content = contentMatch[1]
+          .replace(/<[^>]+>/g, " ")
+          .replace(/\s+/g, " ")
+          .trim()
+          .substring(0, 2000)
+      }
+
+      // Try to get more accurate date
+      const dateMatch = /发布时间[:：]\s*(\d{4}[-/]\d{2}[-/]\d{2})/i.exec(html)
+      if (dateMatch) {
+        article.publishedDate = dateMatch[1]
+      }
+    }
+
+    return {
+      ...article,
+      content: content || article.title, // Fallback to title if no content found
+      rawHtml,
+    }
+  } catch (error) {
+    console.error(`[v0] Error fetching article detail:`, error)
+    return article
+  }
 }
 
 async function filterArticleWithAI(article: any) {
